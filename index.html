@@ -8,8 +8,8 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>【test版】丸とテロップの動画編集｜Video Pointer &amp; Caption｜✿ YUCCHI ✿</title>
-  <meta name="description" content="画面録画の動画に、ふんわり丸とテロップをのせて、縦（ショート）・横の動画に書き出せる無料の動画編集ツール。">
+  <title>【test版】画面録画エディター｜Screen Recording Editor｜画面録画にリング・矢印・テロップをのせて書き出し｜✿ YUCCHI ✿</title>
+  <meta name="description" content="画面録画の動画に、リング・矢印・テロップ（吹き出し）をのせて、縦（ショート）・横の動画に書き出せる無料の画面録画エディター。">
   <!-- test版の間だけ入れています。公開するときは、次の1行を消してください（【test版】のタイトル・バッジ・「このアプリについて」の1行目も） -->
   <meta name="robots" content="noindex">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Zen+Maru+Gothic:wght@400;500;700&family=Yomogi&family=Dancing+Script:wght@500;600&display=swap" rel="stylesheet">
@@ -47,17 +47,21 @@
       line-height: 1.7;
       -webkit-text-size-adjust: 100%;
     }
-    .wrap { max-width: 640px; margin: 0 auto; padding: 0 16px 40px; }
     :focus-visible { outline: 2px solid var(--primary-deep); outline-offset: 2px; }
+    #video { position: fixed; left: 0; top: 0; width: 1px; height: 1px; opacity: .01; pointer-events: none; }
 
+    /* ---------- 全体の並べ方（せまい画面：縦並び／広い画面：左に動画・右にパネル） ---------- */
+    .app { max-width: 640px; margin: 0 auto; padding: 0 16px 40px; }
+    .stage-col { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding: 8px 0 8px; }
+    .panel { margin-top: 8px; }
+
+    /* ---------- ヘッダー（せまい画面） ---------- */
     .test-badge {
       display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .08em;
       background: rgba(255,255,255,.7); color: var(--text);
       border-radius: 999px; padding: 3px 10px 5px; margin-bottom: 8px;
     }
-    /* ---------- ヘッダー ---------- */
-    header { text-align: center; padding: 18px 20px 12px; }
-    @media (min-width: 680px) { header { padding: 36px 20px 12px; } }
+    header { text-align: center; padding: 18px 20px 8px; }
     header h1 {
       font-family: 'Zen Maru Gothic', sans-serif;
       font-size: clamp(17px, 4vw, 22px);
@@ -73,43 +77,30 @@
     header .title-ja-sub {
       font-size: 15px; font-weight: 500; color: var(--text);
       letter-spacing: .06em; opacity: .85; margin-bottom: 14px;
-      display: flex; align-items: center; justify-content: center; gap: 12px;
-      text-align: center;
+      display: flex; align-items: center; justify-content: center; gap: 12px; text-align: center;
     }
     header .title-ja-sub::before, header .title-ja-sub::after {
-      content: ''; display: block; width: 28px; height: 1px;
-      background: currentColor; opacity: .45; flex-shrink: 0;
+      content: ''; display: block; width: 28px; height: 1px; background: currentColor; opacity: .45; flex-shrink: 0;
     }
-    header .brand {
+    .brand {
       font-family: 'Cormorant Garamond', serif;
       font-size: 14px; font-weight: 400; color: var(--brand, #A07080);
       padding-top: 0; display: inline-block; line-height: 1.4;
-      text-decoration: none; transition: opacity .15s;
-      -webkit-tap-highlight-color: transparent;
+      text-decoration: none; transition: opacity .15s; -webkit-tap-highlight-color: transparent;
     }
-    header .brand .brand-deco { font-size: .75em; display: inline-block; vertical-align: .05em; }
-    @media (hover: hover) { header .brand:hover { opacity: .65; } }
+    .brand .brand-deco { font-size: .75em; display: inline-block; vertical-align: .05em; }
+    @media (hover: hover) { header a.brand:hover { opacity: .65; } }
     header .data-hint {
       font-size: 10px; color: var(--text); opacity: .85;
-      letter-spacing: .04em; margin-top: 10px; line-height: 1.7;
-      text-align: center; padding: 0 16px;
+      letter-spacing: .04em; margin-top: 10px; line-height: 1.7; text-align: center; padding: 0 16px;
     }
 
-    /* ---------- カード・見出し ---------- */
-    .sec-div { display: flex; align-items: center; gap: 10px; margin: 26px 0 14px; }
-    .sec-div span { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; letter-spacing: .10em; }
-    .sec-div::before, .sec-div::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.7); }
-    .card { background: var(--surface); border-radius: var(--radius); padding: 16px; }
-    .note {
-      font-size: 13px; color: var(--text); background: rgba(255,255,255,.55);
-      border-radius: var(--radius-sm); padding: 12px 16px; line-height: 2.0;
-    }
+    /* ---------- 部品 ---------- */
+    .card { background: var(--surface); border-radius: var(--radius); padding: 10px; }
     .hint { font-size: 11px; color: var(--text-sub); letter-spacing: .04em; line-height: 1.8; margin: 8px 0 0; }
     .lbl { font-size: 12px; font-weight: 700; color: var(--text-sub); letter-spacing: .06em; margin: 14px 0 6px; }
     .lbl:first-child { margin-top: 0; }
     .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-
-    /* ---------- ボタン（文字が下寄りに見える対策：上1px減・下1px増） ---------- */
     .btn {
       font-family: 'Zen Maru Gothic', sans-serif; font-size: 13px; font-weight: 700;
       color: var(--text); background: var(--surface);
@@ -130,16 +121,12 @@
     .file-btn { position: relative; overflow: hidden; display: inline-block; }
     .file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
     .fname { font-size: 12px; color: var(--text-sub); word-break: break-all; }
-
-    /* ---------- 色の見本 ---------- */
     .sw { display: flex; gap: 8px; flex-wrap: wrap; }
     .sw button {
       width: 30px; height: 30px; border-radius: 50%; padding: 0; cursor: pointer;
       border: 1.5px solid var(--border); -webkit-tap-highlight-color: transparent;
     }
     .sw button.on { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--primary-deep); }
-
-    /* ---------- 入力 ---------- */
     input[type=range] { width: 100%; accent-color: var(--primary-deep); }
     input[type=number], textarea, select {
       font-family: 'Zen Maru Gothic', sans-serif; font-size: 16px; color: var(--text);
@@ -149,38 +136,74 @@
     input[type=color] { width: 48px; height: 34px; padding: 2px; border: 1.5px solid var(--border); border-radius: 10px; background: #fff; cursor: pointer; }
     textarea { width: 100%; resize: vertical; line-height: 1.5; }
     select { max-width: 100%; }
+    .msg { margin-top: 12px; font-size: 12px; color: var(--text); background: var(--secondary); border-radius: 10px; padding: 8px 12px; line-height: 1.8; }
 
-    /* ---------- ステージ（プレビュー） ---------- */
-    .stage { background: var(--soft); border-radius: 14px; padding: 10px; display: flex; justify-content: center; }
+    /* ---------- ステージ（動画のプレビュー） ---------- */
+    .stage {
+      position: relative; height: min(48vh, 520px);
+      display: flex; align-items: center; justify-content: center;
+      background: #E6E3E1; border-radius: 14px; overflow: hidden; padding: 10px;
+    }
     .stage canvas {
-      display: block; max-width: 100%; max-height: min(62vh, 680px);
-      width: auto; height: auto; border-radius: 8px;
+      display: block; flex: none; border-radius: 8px;
       box-shadow: 0 4px 16px rgba(94,70,76,.18);
+      outline: 1.5px solid rgba(94,70,76,.4);
       touch-action: none; -webkit-tap-highlight-color: transparent;
     }
-    #video { position: absolute; left: 0; top: 0; width: 1px; height: 1px; opacity: .01; pointer-events: none; }
-    .time { font-size: 12px; color: var(--text-sub); letter-spacing: .04em; min-width: 92px; text-align: right; }
-    .strip { position: relative; background: var(--soft); border-radius: 8px; margin-top: 10px; overflow: hidden; touch-action: manipulation; }
+    .transport { margin-top: 10px; }
+    .time { font-size: 12px; color: var(--text-sub); letter-spacing: .04em; min-width: 92px; text-align: right; margin-left: auto; }
+    .strip { position: relative; background: var(--soft); border-radius: 8px; margin-top: 8px; overflow: hidden; touch-action: manipulation; }
     .strip .bar {
       position: absolute; height: 8px; border-radius: 4px; cursor: pointer;
       border: 1px solid rgba(94,70,76,.35); padding: 0;
     }
     .strip .bar.sel { box-shadow: 0 0 0 2px var(--primary-deep); }
     .strip .ph { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--text); opacity: .7; pointer-events: none; }
+    .strip .shade { position: absolute; top: 0; bottom: 0; background: rgba(94,70,76,.25); pointer-events: none; }
+    .strip .ffb { position: absolute; top: 0; bottom: 0; background: rgba(244,200,90,.45); border-left: 1.5px solid rgba(180,130,30,.6); border-right: 1.5px solid rgba(180,130,30,.6); pointer-events: none; }
+    .tools-row { margin-top: 10px; }
 
-    /* ---------- 置いたもの一覧 ---------- */
+    /* ---------- パネル ---------- */
+    .panel-card { background: var(--surface); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+    .panel-head {
+      display: none; position: relative; text-align: center; cursor: pointer; user-select: none;
+      background: var(--primary); padding: 9px 44px; -webkit-tap-highlight-color: transparent;
+    }
+    .ph-ja { font-size: 14px; font-weight: 500; letter-spacing: .08em; line-height: 1.4; }
+    .ph-en { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 400; letter-spacing: .06em; line-height: 1.2; white-space: nowrap; }
+    .ph-fade { overflow: hidden; max-height: 80px; opacity: 1; transition: opacity .6s ease, max-height .4s ease .6s; }
+    .panel-head.compact .ph-fade { opacity: 0; max-height: 0; }
+    .ph-sub { font-size: 11px; letter-spacing: .04em; margin-top: 4px; line-height: 1.5; opacity: .9; }
+    .panel-head .brand { display: block; font-size: 11px; padding-top: 6px; color: var(--text); opacity: .82; }
+    .ph-toggle {
+      position: absolute; right: 10px; top: 9px; width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(255,255,255,.75); font-weight: 700; line-height: 22px; pointer-events: none;
+    }
+    .ph-badge { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: .08em; background: rgba(255,255,255,.7); border-radius: 999px; padding: 1px 8px 3px; margin-bottom: 3px; }
+    .panel-card.collapsed .panel-body { display: none; }
+    .panel-body { padding: 4px 14px 14px; }
+
+    .acc { border-top: 1px dotted var(--border); }
+    .acc:first-child { border-top: none; }
+    .acc-head {
+      width: 100%; background: none; border: none; display: flex; align-items: center; gap: 10px;
+      padding: 12px 2px; font-family: 'Zen Maru Gothic', sans-serif; font-size: 14px; font-weight: 700;
+      color: var(--text); cursor: pointer; letter-spacing: .06em; text-align: left; -webkit-tap-highlight-color: transparent;
+    }
+    .acc-dots { flex: 1; border-bottom: 1.5px dotted var(--border); height: 1px; }
+    .acc-arrow { font-size: 10px; color: var(--text-sub); opacity: .7; transition: transform .25s ease; }
+    .acc.open .acc-arrow { transform: rotate(180deg); }
+    .acc-body { display: none; padding: 0 2px 14px; }
+    .acc.open .acc-body { display: block; }
+
     .chips { display: flex; gap: 6px; flex-wrap: wrap; }
     .chip { font-size: 12px; padding: 6px 12px 8px; text-align: left; max-width: 100%; }
-    .chip.on { background: var(--primary); border-color: var(--primary-deep); }
-
-    /* ---------- 書き出し ---------- */
     .progress { height: 10px; background: var(--soft); border-radius: 999px; overflow: hidden; margin: 12px 0 6px; }
     .progress i { display: block; height: 100%; width: 0; background: var(--primary-deep); transition: width .2s; }
-    .res video { width: 100%; max-height: 60vh; border-radius: 10px; background: var(--soft); }
-    .msg { margin-top: 12px; font-size: 12px; color: var(--text); background: var(--secondary); border-radius: 10px; padding: 8px 12px; line-height: 1.8; }
+    .res video { width: 100%; max-height: 50vh; border-radius: 10px; background: var(--soft); }
     body.exporting .lock { pointer-events: none; opacity: .5; }
 
-    /* ---------- アコーディオン ---------- */
+    /* ---------- アコーディオン（このアプリについて／データについて） ---------- */
     .data-note { width: 100%; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--border); background: var(--surface); margin-bottom: 2px; }
     .data-note-btn {
       width: 100%; background: none; border: none; padding: 11px 16px;
@@ -204,7 +227,7 @@
     .reload-latest-btn:active { transform: scale(.97); }
 
     /* ---------- フッター ---------- */
-    .x-footer-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 2px 0; }
+    .x-footer-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 2px 0; }
     .x-footer-icons { display: flex; align-items: center; gap: 8px; }
     .x-icon-btn {
       position: relative; display: inline-flex; align-items: center; justify-content: center;
@@ -214,7 +237,7 @@
     }
     .x-icon-btn svg { fill: var(--text-sub); }
     .x-icon-btn:hover { background: #fff5f6; border-color: var(--border); }
-    .last-updated { font-size: 10px; color: var(--text); opacity: .85; letter-spacing: .04em; }
+    .last-updated { font-size: 10px; color: var(--text-sub); letter-spacing: .04em; }
     @media (hover: hover) {
       .x-icon-btn::after {
         content: attr(data-tooltip); position: absolute; bottom: calc(100% + 6px); left: 0;
@@ -224,235 +247,395 @@
       }
       .x-icon-btn:hover::after { opacity: .88; transform: translateY(0); }
     }
+
+    /* ---------- 広い画面：左に動画・右にパネル（パネルの中だけスクロール） ---------- */
+    @media (min-width: 900px) {
+      html, body { height: 100%; overflow: hidden; }
+      .app { max-width: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; height: 100vh; height: 100dvh; }
+      header.app-head { display: none; }
+      .stage-col { position: static; padding: 14px 10px 14px 14px; height: 100%; min-height: 0; background: none; }
+      .stage-card { height: 100%; display: flex; flex-direction: column; }
+      .stage { flex: 1; height: auto; min-height: 0; }
+      .panel { margin-top: 0; height: 100%; min-height: 0; padding: 14px 14px 14px 0; }
+      .panel-card { height: 100%; }
+      .panel-card.collapsed { height: auto; }
+      .panel-head { display: block; }
+      .panel-body { overflow-y: auto; flex: 1; min-height: 0; font-size: 13px; }
+      .panel .btn { font-size: 12px; padding: 7px 12px 9px; }
+      .panel .btn.big { font-size: 14px; padding: 11px 22px 13px; }
+      .panel .btn.small { font-size: 11px; padding: 5px 10px 7px; }
+      .panel .sw button { width: 26px; height: 26px; }
+      .panel .lbl { font-size: 11px; margin: 12px 0 5px; }
+      .panel .hint { font-size: 10px; }
+    }
   </style>
 </head>
 <body id="top">
-<div class="wrap">
+<video id="video" playsinline preload="auto"></video>
 
-  <header>
+<div class="app">
+
+  <!-- せまい画面のヘッダー -->
+  <header class="app-head">
     <div class="test-badge">test版・実験中</div>
-    <h1>丸とテロップの動画編集</h1>
-    <h2>Video Pointer &amp; Caption</h2>
-    <div class="title-ja-sub">画面録画に、ふんわり丸とテロップをのせて書き出せます</div>
+    <h1>画面録画エディター</h1>
+    <h2>Screen Recording Editor</h2>
+    <div class="title-ja-sub">画面録画に、リング・矢印・テロップをのせて書き出せます</div>
     <a class="brand" href="https://webkorisu.github.io/yucchis-portal/" target="_blank" rel="noopener noreferrer" aria-label="✿ YUCCHIのアプリ一覧を開く"><span class="brand-deco">✿</span>&nbsp;&nbsp;Y&nbsp;U&nbsp;C&nbsp;C&nbsp;H&nbsp;I&nbsp;&nbsp;<span class="brand-deco">✿</span></a>
     <div class="data-hint">動画はこの端末の中だけで使われます</div>
   </header>
 
-  <div class="note">
-    ① 動画をえらぶ　② 縦・横の形をきめる　③ 画面をタップして丸・テロップを置く　④ 書き出す
-  </div>
+  <!-- 動画のプレビューと、再生・置く道具（いつも見えている場所） -->
+  <main class="stage-col">
+    <div class="card stage-card">
+      <div class="stage" id="stage"><canvas id="cv" width="720" height="1280"></canvas></div>
 
-  <!-- ① 動画 -->
-  <div class="sec-div"><span>① 動画をえらぶ</span></div>
-  <div class="card">
-    <div class="row">
-      <label class="btn main file-btn">動画をえらぶ<input type="file" id="file" accept="video/*"></label>
-      <span class="fname" id="fname">まだ選ばれていません</span>
-    </div>
-    <p class="hint">iPadの画面収録で撮った動画を選んでください。</p>
-  </div>
-
-  <!-- ② 形 -->
-  <div class="sec-div"><span>② 書き出しの形</span></div>
-  <div class="card lock">
-    <div class="lbl">向き</div>
-    <div class="seg" id="segOrient">
-      <button type="button" class="btn" data-v="portrait">縦（ショート 9:16）</button>
-      <button type="button" class="btn" data-v="landscape">横（16:9）</button>
-    </div>
-    <div class="lbl">動画の入れ方</div>
-    <div class="seg" id="segFit">
-      <button type="button" class="btn" data-v="contain">ぜんぶ見せる（余白あり）</button>
-      <button type="button" class="btn" data-v="cover">いっぱいに（はみ出しはカット）</button>
-    </div>
-    <div class="lbl">背景の色（アプリのイメージカラー）</div>
-    <div class="sw" id="swBg"></div>
-    <div class="row" style="margin-top:8px;"><input type="color" id="bgPick" value="#FFE8E8" aria-label="好きな色をえらぶ"><span class="hint" style="margin:0;">好きな色もえらべます</span></div>
-    <div class="lbl">動画の大きさ</div>
-    <input type="range" id="vScale" min="0.4" max="1" step="0.01" value="0.92" aria-label="動画の大きさ">
-    <div class="lbl">動画の上下の位置</div>
-    <input type="range" id="vPos" min="0" max="1" step="0.01" value="0.5" aria-label="動画の上下の位置">
-    <p class="hint">動画を小さくして下寄りにすると、上にテロップの場所をあけられます。</p>
-    <div class="lbl">白いカードで囲む</div>
-    <div class="seg" id="segCard">
-      <button type="button" class="btn" data-v="on">囲む</button>
-      <button type="button" class="btn" data-v="off">囲まない</button>
-    </div>
-    <div class="lbl">ショートの「かくれやすい場所」ガイド（縦のときだけ）</div>
-    <div class="seg" id="segGuide">
-      <button type="button" class="btn" data-v="on">表示する</button>
-      <button type="button" class="btn" data-v="off">表示しない</button>
-    </div>
-    <div class="lbl">きれいさ</div>
-    <div class="seg" id="segQ">
-      <button type="button" class="btn" data-v="720">ふつう（軽い）</button>
-      <button type="button" class="btn" data-v="1080">きれい（重い）</button>
-    </div>
-    <p class="hint">まずは「ふつう」がおすすめです。iPadで動きがカクカクしたら「ふつう」に戻してください。</p>
-  </div>
-
-  <!-- ③ 編集 -->
-  <div class="sec-div"><span>③ 丸・テロップを置く</span></div>
-  <div class="card">
-    <div class="stage"><canvas id="cv" width="720" height="1280"></canvas></div>
-    <video id="video" playsinline preload="auto"></video>
-
-    <div class="row" style="margin-top:12px;">
-      <button type="button" class="btn main" id="playBtn">再生</button>
-      <button type="button" class="btn small" data-step="-1">−1秒</button>
-      <button type="button" class="btn small" data-step="-0.1">−0.1</button>
-      <button type="button" class="btn small" data-step="0.1">+0.1</button>
-      <button type="button" class="btn small" data-step="1">+1秒</button>
-      <span class="time" id="timeLabel">0:00.0 / 0:00.0</span>
-    </div>
-    <input type="range" id="seek" min="0" max="0" step="0.01" value="0" style="margin-top:8px;" aria-label="再生位置">
-    <div class="strip" id="strip"><div class="ph" id="ph"></div></div>
-
-    <div class="lbl" style="margin-top:16px;">置くもの</div>
-    <div class="seg lock" id="tools">
-      <button type="button" class="btn" data-v="select">えらぶ・動かす</button>
-      <button type="button" class="btn" data-v="circle">丸を置く</button>
-      <button type="button" class="btn" data-v="caption">テロップを置く</button>
-    </div>
-    <p class="hint" id="toolHint"></p>
-    <p class="hint" id="guideHint">うす暗い部分（上・下・右下）は、ショートで文字や操作ボタンに隠れやすい場所です。アプリによって違うので、目安にしてください。この暗い表示は、書き出した動画には入りません。</p>
-  </div>
-
-  <!-- 編集パネル -->
-  <div class="card lock" style="margin-top:14px;">
-    <div id="edEmpty" class="hint" style="margin:0;">置いた丸やテロップをタップして選ぶと、ここで色・時間・文字などを変えられます。</div>
-    <div id="edBody" hidden>
-      <div class="row" style="justify-content:space-between;">
-        <strong id="edTitle" style="font-size:14px;letter-spacing:.06em;"></strong>
-        <span class="row">
-          <button type="button" class="btn small" id="btnView">ここを見る</button>
-          <button type="button" class="btn small" id="btnDup">コピー</button>
-          <button type="button" class="btn small danger" id="btnDel">消す</button>
-        </span>
+      <div class="row transport lock">
+        <button type="button" class="btn main" id="playBtn">再生</button>
+        <button type="button" class="btn small" data-step="-1">−1秒</button>
+        <button type="button" class="btn small" data-step="-0.1">−0.1</button>
+        <button type="button" class="btn small" data-step="0.1">+0.1</button>
+        <button type="button" class="btn small" data-step="1">+1秒</button>
+        <span class="time" id="timeLabel">0:00.0 / 0:00.0</span>
       </div>
+      <input type="range" id="seek" class="lock" min="0" max="0" step="0.01" value="0" style="margin-top:6px;" aria-label="再生位置">
+      <div class="strip lock" id="strip"><div class="shade" id="shL" style="left:0;width:0;"></div><div class="shade" id="shR" style="right:0;left:100%;"></div><div class="ph" id="ph"></div></div>
 
-      <div class="msg" id="warnSel" hidden>ショートでは、この位置は文字や操作ボタンで隠れやすいです。もう少し内側に動かしてみてください。</div>
-      <div class="lbl">出る時間（秒）</div>
-      <div class="row">
-        <input type="number" id="fT0" step="0.1" min="0" inputmode="decimal" aria-label="出る時間">
-        <button type="button" class="btn small" id="btnT0">いまの位置にする</button>
-      </div>
-      <div class="lbl">消える時間（秒）</div>
-      <div class="row">
-        <input type="number" id="fT1" step="0.1" min="0" inputmode="decimal" aria-label="消える時間">
-        <button type="button" class="btn small" id="btnT1">いまの位置にする</button>
-      </div>
-
-      <div id="grpCircle">
-        <div class="lbl">丸の色</div>
-        <div class="sw" id="swCircle"></div>
-        <div class="lbl">丸の大きさ</div>
-        <input type="range" id="fSizeC" min="0.04" max="0.25" step="0.005" aria-label="丸の大きさ">
-      </div>
-
-      <div id="grpCaption">
-        <div class="lbl">文字（改行できます）</div>
-        <textarea id="fText" rows="2" maxlength="120"></textarea>
-        <div class="lbl">スタイル</div>
-        <div class="seg" id="segStyle">
-          <button type="button" class="btn" data-v="band">帯つき</button>
-          <button type="button" class="btn" data-v="outline">文字だけ（ふちどり）</button>
-        </div>
-        <div class="lbl">文字のそろえ方</div>
-        <div class="seg" id="segAlign">
-          <button type="button" class="btn" data-v="left">左そろえ</button>
-          <button type="button" class="btn" data-v="center">まんなか</button>
-        </div>
-        <div class="lbl">フォント</div>
-        <select id="fFont" aria-label="フォント"></select>
-        <p class="hint" id="fontHint"></p>
-        <div class="lbl">文字の大きさ</div>
-        <input type="range" id="fSizeT" min="0.03" max="0.12" step="0.005" aria-label="文字の大きさ">
-        <div class="lbl">帯・ふちの色</div>
-        <div class="sw" id="swBand"></div>
-        <div class="lbl">文字の色</div>
-        <div class="sw" id="swText"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 一覧 -->
-  <div class="sec-div"><span>置いたもの</span></div>
-  <div class="card lock">
-    <div class="chips" id="chips"></div>
-    <p class="hint" id="chipsEmpty">まだ何も置かれていません。</p>
-  </div>
-
-  <!-- ④ 書き出し -->
-  <div class="sec-div"><span>④ 書き出す</span></div>
-  <div class="card">
-    <p class="hint" style="margin:0 0 12px;">書き出しは、動画と同じ長さの時間がかかります（1分の動画なら1分）。書き出し中は、画面を閉じたり別のアプリに切りかえたりしないでください。</p>
-    <div class="row">
-      <button type="button" class="btn main big" id="exportBtn">書き出す</button>
-      <button type="button" class="btn" id="cancelBtn" hidden>やめる</button>
-    </div>
-    <div id="expProg" hidden>
-      <div class="progress"><i id="progBar"></i></div>
-      <div class="hint" id="progText" style="margin:0;"></div>
-    </div>
-    <div class="msg" id="msg" hidden></div>
-    <div class="res" id="res" hidden style="margin-top:14px;">
-      <video id="resVideo" controls playsinline></video>
-      <div class="row" style="margin-top:10px;">
-        <a class="btn main" id="dlLink" download="yucchi-video.mp4" style="text-decoration:none;display:inline-block;">保存する</a>
-        <button type="button" class="btn" id="shareBtn" hidden>共有・写真に保存</button>
-      </div>
-      <p class="hint" id="resHint"></p>
-    </div>
-  </div>
-
-  <!-- このアプリについて／データについて -->
-  <div style="margin-top:24px;">
-    <div style="display:flex; flex-direction:column; gap:6px;">
-      <div class="data-note" id="aboutNote">
-        <button class="data-note-btn" type="button" onclick="toggleAboutNote()">
-          <span>✿ このアプリについて</span>
-          <span class="data-note-arrow">▼</span>
-        </button>
-        <div class="data-note-body">
-          <p>このアプリは、test版（実験中）です。内容が変わったり、うまく動かなかったりすることがあります。</p>
-          <p>このアプリは、アプリ紹介などの動画づくりをちょっと便利にするために作られた個人制作のツールです。</p>
-          <p>書き出した動画の見た目・音・保存形式は、お使いの端末やブラウザによって異なる場合があります。必ずご自身でご確認のうえお使いください。</p>
-          <p>作者（YUCCHI）は、アプリの内容・結果によって生じたいかなる損害についても責任を負いかねます。あらかじめご了承ください。</p>
-          <p>このアプリのコード・デザインは、作者（YUCCHI）が制作したものです。コードやデザインをそのまま複製・再配布・販売することはご遠慮ください。</p>
+      <div class="row tools-row lock">
+        <span class="lbl" style="margin:0;">置くもの</span>
+        <div class="seg" id="tools">
+          <button type="button" class="btn small" data-v="select">えらぶ・動かす</button>
+          <button type="button" class="btn small" data-v="circle">リングを置く</button>
+          <button type="button" class="btn small" data-v="arrow">矢印を置く</button>
+          <button type="button" class="btn small" data-v="caption">テロップを置く</button>
         </div>
       </div>
-      <div class="data-note" id="dataNote">
-        <button class="data-note-btn" type="button" onclick="toggleDataNote()">
-          <span>✿ データについて</span>
-          <span class="data-note-arrow">▼</span>
-        </button>
-        <div class="data-note-body">
-          <p>選んだ動画は、この端末の中だけで使われ、外には送られません。</p>
-          <p>編集した内容は保存されません。ページを閉じる前に、書き出しておくと安心です。</p>
-          <p>文字のフォントを表示するときだけ、Google Fontsからの読み込みでネット通信が行われます。</p>
-          <p>📱 ホーム画面に追加してご利用の場合、アップデート後もすぐには最新版に切り替わらないことがあります。反映されない時は、アプリスイッチャーから一度完全に閉じて開き直すか、下のボタンで最新版を読み込み直せます。</p>
-          <button type="button" class="reload-latest-btn" onclick="reloadLatestVersion()">🔄 最新版を読み込み直す</button>
+      <p class="hint" id="toolHint"></p>
+    </div>
+  </main>
+
+  <!-- 操作パネル -->
+  <aside class="panel">
+    <div class="panel-card" id="panelCard">
+
+      <div class="panel-head" id="panelHead" role="button" tabindex="0" aria-label="パネルを開いたり閉じたりする">
+        <div class="ph-badge">test版・実験中</div>
+        <div class="ph-ja">画面録画エディター</div>
+        <div class="ph-en">Screen Recording Editor</div>
+        <div class="ph-fade">
+          <div class="ph-sub">画面録画に、説明をのせる</div>
+          <div class="brand"><span class="brand-deco">✿</span>&nbsp;&nbsp;Y&nbsp;U&nbsp;C&nbsp;C&nbsp;H&nbsp;I&nbsp;&nbsp;<span class="brand-deco">✿</span></div>
         </div>
+        <div class="ph-toggle" id="phToggle">−</div>
+      </div>
+
+      <div class="panel-body">
+
+        <!-- ① 動画と使う範囲 -->
+        <div class="acc open lock-not" id="acc-video">
+          <button type="button" class="acc-head"><span>① 動画・使う範囲・早送り</span><span class="acc-dots"></span><span class="acc-arrow">▼</span></button>
+          <div class="acc-body">
+            <div class="row">
+              <label class="btn main file-btn">動画をえらぶ<input type="file" id="file" accept="video/*"></label>
+            </div>
+            <div class="fname" id="fname" style="margin-top:6px;">まだ選ばれていません</div>
+            <p class="hint">画面収録で撮った動画を選んでください。</p>
+
+            <div class="lbl">使う範囲（前後をカット）</div>
+            <div class="hint" id="trimLbl" style="margin:0 0 6px;">0:00.0 〜 0:00.0</div>
+            <div class="row">
+              <button type="button" class="btn small" id="btnTrimIn">ここから使う</button>
+              <button type="button" class="btn small" id="btnTrimOut">ここまで使う</button>
+              <button type="button" class="btn small" id="btnTrimReset">全部使う</button>
+            </div>
+            <p class="hint">再生位置を合わせてからボタンを押します。カットした部分は、下の細い帯が暗く見えます。書き出した動画には入りません。</p>
+
+            <div class="lbl">早送り（待ち時間をとばす）</div>
+            <div class="seg" id="segFfRate">
+              <button type="button" class="btn" data-v="2">2倍</button>
+              <button type="button" class="btn" data-v="4">4倍</button>
+              <button type="button" class="btn" data-v="8">8倍</button>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <button type="button" class="btn small" id="btnFfStart">ここから早送り</button>
+              <button type="button" class="btn small main" id="btnFfEnd">ここまでを早送りにする</button>
+            </div>
+            <div class="hint" id="ffState" style="margin:6px 0 0;"></div>
+            <div class="chips" id="ffList" style="margin-top:8px;"></div>
+            <div class="hint" id="ffInfo"></div>
+            <p class="hint">再生位置を合わせて、始まりと終わりを押します。早送りの部分は、下の細い帯が黄色く見えます。早送りの範囲に置いたリングやテロップは、見える時間が短くなります。音は、速くすると聞こえなくなることがあります。</p>
+          </div>
+        </div>
+
+        <!-- ② 形と見た目 -->
+        <div class="acc lock" id="acc-shape">
+          <button type="button" class="acc-head"><span>② 形と見た目</span><span class="acc-dots"></span><span class="acc-arrow">▼</span></button>
+          <div class="acc-body">
+            <div class="lbl">向き</div>
+            <div class="seg" id="segOrient">
+              <button type="button" class="btn" data-v="portrait">縦（ショート 9:16）</button>
+              <button type="button" class="btn" data-v="landscape">横（16:9）</button>
+            </div>
+            <div class="lbl">動画の入れ方</div>
+            <div class="seg" id="segFit">
+              <button type="button" class="btn" data-v="contain">ぜんぶ見せる</button>
+              <button type="button" class="btn" data-v="cover">いっぱいに</button>
+            </div>
+            <div class="lbl">背景の色</div>
+            <div class="sw" id="swBg"></div>
+            <div class="row" style="margin-top:8px;"><input type="color" id="bgPick" value="#FFE8E8" aria-label="好きな色をえらぶ"><span class="hint" style="margin:0;">好きな色もえらべます</span></div>
+            <div class="lbl">動画の大きさ</div>
+            <input type="range" id="vScale" min="0.4" max="1" step="0.01" value="0.92" aria-label="動画の大きさ">
+            <div class="lbl">動画の上下の位置</div>
+            <input type="range" id="vPos" min="0" max="1" step="0.01" value="0.5" aria-label="動画の上下の位置">
+            <p class="hint">動画を小さくして下寄りにすると、上にテロップの場所をあけられます。リングは動画についていくので、あとから動かしてもズレません。</p>
+            <div class="lbl">白いカードで囲む</div>
+            <div class="seg" id="segCard">
+              <button type="button" class="btn" data-v="on">囲む</button>
+              <button type="button" class="btn" data-v="off">囲まない</button>
+            </div>
+            <div class="lbl">ショートの「かくれやすい場所」ガイド（縦のときだけ）</div>
+            <div class="seg" id="segGuide">
+              <button type="button" class="btn" data-v="on">表示する</button>
+              <button type="button" class="btn" data-v="off">表示しない</button>
+            </div>
+            <p class="hint">うす暗い部分（上・下・右下）は、ショートで文字や操作ボタンに隠れやすい場所の目安です。書き出した動画には入りません。</p>
+            <div class="lbl">きれいさ</div>
+            <div class="seg" id="segQ">
+              <button type="button" class="btn" data-v="720">ふつう（軽い）</button>
+              <button type="button" class="btn" data-v="1080">きれい（おすすめ）</button>
+            </div>
+            <p class="hint">画面録画の文字をくっきり見せたいときは「きれい」に。iPadでカクカクするときは「ふつう」に戻してください。</p>
+          </div>
+        </div>
+
+        <!-- ③ 選んだもの -->
+        <div class="acc lock" id="acc-edit">
+          <button type="button" class="acc-head"><span>③ 選んだもの</span><span class="acc-dots"></span><span class="acc-arrow">▼</span></button>
+          <div class="acc-body">
+            <div id="edEmpty" class="hint" style="margin:0;">置いたリングや矢印、テロップをタップして選ぶと、ここで色・時間・文字などを変えられます。</div>
+            <div id="edBody" hidden>
+              <div class="row" style="justify-content:space-between;">
+                <strong id="edTitle" style="font-size:14px;letter-spacing:.06em;"></strong>
+                <span class="row">
+                  <button type="button" class="btn small" id="btnView">ここを見る</button>
+                  <button type="button" class="btn small" id="btnFav">よく使うに保存</button>
+                  <button type="button" class="btn small" id="btnDup">コピー</button>
+                  <button type="button" class="btn small danger" id="btnDel">消す</button>
+                </span>
+              </div>
+              <div class="msg" id="warnSel" hidden>ショートでは、この位置は文字や操作ボタンで隠れやすいです。もう少し内側に動かしてみてください。</div>
+
+              <div class="lbl">出る時間（秒）</div>
+              <div class="row">
+                <input type="number" id="fT0" step="0.1" min="0" inputmode="decimal" aria-label="出る時間">
+                <button type="button" class="btn small" id="btnT0">いまの位置にする</button>
+              </div>
+              <div class="lbl">消える時間（秒）</div>
+              <div class="row">
+                <input type="number" id="fT1" step="0.1" min="0" inputmode="decimal" aria-label="消える時間">
+                <button type="button" class="btn small" id="btnT1">いまの位置にする</button>
+              </div>
+
+              <div id="grpCircle">
+                <div class="lbl">リングのかたち</div>
+                <div class="seg" id="segShape">
+                  <button type="button" class="btn" data-v="soft">ふんわり二重</button>
+                  <button type="button" class="btn" data-v="solid">実線</button>
+                  <button type="button" class="btn" data-v="dashed">点線</button>
+                </div>
+                <div class="lbl">リングの色</div>
+                <div class="sw" id="swCircle"></div>
+                <div class="lbl">リングの大きさ</div>
+                <input type="range" id="fSizeC" min="0.04" max="0.25" step="0.005" aria-label="リングの大きさ">
+              </div>
+
+              <div id="grpArrow">
+                <div class="lbl">矢印のかたち</div>
+                <div class="seg" id="segArrowShape">
+                  <button type="button" class="btn" data-v="line">直線</button>
+                  <button type="button" class="btn" data-v="curve">カーブ</button>
+                  <button type="button" class="btn" data-v="dashed">点線</button>
+                </div>
+                <div class="lbl">矢印の色</div>
+                <div class="sw" id="swArrow"></div>
+                <div class="lbl">長さ</div>
+                <input type="range" id="fLen" min="0.05" max="0.6" step="0.005" aria-label="矢印の長さ">
+                <div class="lbl">向き（回転）</div>
+                <div class="row">
+                  <input type="range" id="fAngle" min="0" max="359" step="1" style="flex:1;" aria-label="矢印の向き">
+                  <span class="hint" id="angLbl" style="margin:0;min-width:40px;text-align:right;">0°</span>
+                </div>
+                <div class="row" style="margin-top:6px;">
+                  <button type="button" class="btn small" id="btnRotL">−15°</button>
+                  <button type="button" class="btn small" id="btnRotR">+15°</button>
+                  <button type="button" class="btn small" id="btnRot180">反対向き</button>
+                </div>
+                <div id="rowBend">
+                  <div class="lbl">曲がり具合（プラス・マイナスで反対向き）</div>
+                  <input type="range" id="fBend" min="-0.9" max="0.9" step="0.05" aria-label="曲がり具合">
+                </div>
+                <p class="hint">矢印の先が、タップした場所です。しっぽの白い丸をドラッグしても、向きと長さを変えられます。</p>
+              </div>
+
+              <div id="grpWidth">
+                <div class="lbl">線の太さ</div>
+                <div class="seg" id="segWidth">
+                  <button type="button" class="btn" data-v="thin">細め</button>
+                  <button type="button" class="btn" data-v="mid">ふつう</button>
+                  <button type="button" class="btn" data-v="thick">太め</button>
+                </div>
+                <input type="range" id="fWidth" min="0.006" max="0.03" step="0.001" style="margin-top:8px;" aria-label="線の太さ">
+              </div>
+
+              <div id="grpCaption">
+                <div class="lbl">文字（改行できます）</div>
+                <textarea id="fText" rows="2" maxlength="120"></textarea>
+                <div class="lbl">スタイル</div>
+                <div class="seg" id="segStyle">
+                  <button type="button" class="btn" data-v="band">帯つき</button>
+                  <button type="button" class="btn" data-v="bubble">吹き出し</button>
+                  <button type="button" class="btn" data-v="outline">文字だけ（ふちどり）</button>
+                </div>
+                <div class="lbl">文字のそろえ方</div>
+                <div class="seg" id="segAlign">
+                  <button type="button" class="btn" data-v="left">左そろえ</button>
+                  <button type="button" class="btn" data-v="center">まんなか</button>
+                </div>
+                <div id="rowBubble">
+                  <div class="lbl">吹き出しのしっぽの向き</div>
+                  <div class="seg">
+                    <button type="button" class="btn small" id="btnTailDown">下</button>
+                    <button type="button" class="btn small" id="btnTailUp">上</button>
+                    <button type="button" class="btn small" id="btnTailLeft">左</button>
+                    <button type="button" class="btn small" id="btnTailRight">右</button>
+                  </div>
+                  <div class="lbl">しっぽの根元の位置（箱のふちに沿って）<span id="tbLbl" style="font-weight:400;"></span></div>
+                  <input type="range" id="fTb" min="-1" max="1" step="0.05" aria-label="しっぽの根元の位置">
+                  <div class="row" style="margin-top:6px;"><button type="button" class="btn small" id="btnTbAuto">自動にもどす</button></div>
+                  <p class="hint">しっぽの先の白い丸で「指す場所」、根元の小さな丸で「出る位置」を、ドラッグして動かせます。</p>
+                </div>
+                <div class="lbl">フォント</div>
+                <select id="fFont" aria-label="フォント"></select>
+                <p class="hint" id="fontHint"></p>
+                <div class="lbl">文字の大きさ</div>
+                <input type="range" id="fSizeT" min="0.03" max="0.12" step="0.005" aria-label="文字の大きさ">
+                <div class="lbl">帯・ふちの色</div>
+                <div class="sw" id="swBand"></div>
+                <div class="lbl">文字の色</div>
+                <div class="sw" id="swText"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ よく使うリング・矢印・テロップ -->
+        <div class="acc lock" id="acc-fav">
+          <button type="button" class="acc-head"><span>④ よく使うリング・矢印・テロップ</span><span class="acc-dots"></span><span class="acc-arrow">▼</span></button>
+          <div class="acc-body">
+            <div class="lbl">リング</div>
+            <div class="chips" id="favCircle"></div>
+            <p class="hint" id="favCircleEmpty">まだありません。</p>
+            <div class="lbl">矢印</div>
+            <div class="chips" id="favArrow"></div>
+            <p class="hint" id="favArrowEmpty">まだありません。</p>
+            <div class="lbl">テロップ</div>
+            <div class="chips" id="favCaption"></div>
+            <p class="hint" id="favCaptionEmpty">まだありません。</p>
+            <p class="hint">③でリング・矢印・テロップを選んで「よく使うに保存」を押すと、ここに入ります。タップすると、選んでいる同じ種類のものに使われて、次に置くときもその見た目になります。</p>
+            <p class="hint">保存されるのは見た目だけです（かたち・色・大きさ・太さ・向き・スタイル・フォントなど）。位置・時間・文字は保存されません。</p>
+            <div class="row" style="margin-top:8px;">
+              <button type="button" class="btn small" id="favResetC">リングを初期の見た目に戻す</button>
+              <button type="button" class="btn small" id="favResetA">矢印を初期の見た目に戻す</button>
+              <button type="button" class="btn small" id="favResetT">テロップを初期の見た目に戻す</button>
+            </div>
+            <p class="hint" id="favNote"></p>
+          </div>
+        </div>
+
+        <!-- ⑤ 置いたもの -->
+        <div class="acc lock" id="acc-list">
+          <button type="button" class="acc-head"><span>⑤ 置いたもの</span><span class="acc-dots"></span><span class="acc-arrow">▼</span></button>
+          <div class="acc-body">
+            <div class="chips" id="chips"></div>
+            <p class="hint" id="chipsEmpty">まだ何も置かれていません。</p>
+          </div>
+        </div>
+
+        <!-- ⑤ 書き出す -->
+        <div class="acc" id="acc-export">
+          <button type="button" class="acc-head"><span>⑥ 書き出す</span><span class="acc-dots"></span><span class="acc-arrow">▼</span></button>
+          <div class="acc-body">
+            <p class="hint" style="margin:0 0 12px;">書き出しは、使う範囲と同じ長さの時間がかかります。書き出し中は、画面を閉じたり別のアプリに切りかえたりしないでください。</p>
+            <div class="row">
+              <button type="button" class="btn main big" id="exportBtn">書き出す</button>
+              <button type="button" class="btn" id="cancelBtn" hidden>やめる</button>
+            </div>
+            <div id="expProg" hidden>
+              <div class="progress"><i id="progBar"></i></div>
+              <div class="hint" id="progText" style="margin:0;"></div>
+            </div>
+            <div class="msg" id="msg" hidden></div>
+            <div class="res" id="res" hidden style="margin-top:14px;">
+              <video id="resVideo" controls playsinline></video>
+              <div class="row" style="margin-top:10px;">
+                <a class="btn main" id="dlLink" download="yucchi-video.mp4" style="text-decoration:none;display:inline-block;">保存する</a>
+                <button type="button" class="btn" id="shareBtn" hidden>共有・写真に保存</button>
+              </div>
+              <p class="hint" id="resHint"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- このアプリについて／データについて -->
+        <div style="margin-top:16px; display:flex; flex-direction:column; gap:6px;">
+          <div class="data-note" id="aboutNote">
+            <button class="data-note-btn" type="button" onclick="toggleAboutNote()">
+              <span>✿ このアプリについて</span>
+              <span class="data-note-arrow">▼</span>
+            </button>
+            <div class="data-note-body">
+              <p>このアプリは、test版（実験中）です。内容が変わったり、うまく動かなかったりすることがあります。</p>
+              <p>このアプリは、アプリ紹介などの動画づくりをちょっと便利にするために作られた個人制作のツールです。</p>
+              <p>書き出した動画の見た目・音・保存形式は、お使いの端末やブラウザによって異なる場合があります。必ずご自身でご確認のうえお使いください。</p>
+              <p>作者（YUCCHI）は、アプリの内容・結果によって生じたいかなる損害についても責任を負いかねます。あらかじめご了承ください。</p>
+              <p>このアプリのコード・デザインは、作者（YUCCHI）が制作したものです。コードやデザインをそのまま複製・再配布・販売することはご遠慮ください。</p>
+            </div>
+          </div>
+          <div class="data-note" id="dataNote">
+            <button class="data-note-btn" type="button" onclick="toggleDataNote()">
+              <span>✿ データについて</span>
+              <span class="data-note-arrow">▼</span>
+            </button>
+            <div class="data-note-body">
+              <p>選んだ動画は、この端末の中だけで使われ、外には送られません。</p>
+              <p>置いたリングや矢印、テロップなど、編集した内容は保存されません。ページを閉じる前に、書き出しておくと安心です。「よく使う」に保存した見た目だけは、この端末のブラウザに残ります（動画は保存されません）。</p>
+              <p>文字のフォントを表示するときだけ、Google Fontsからの読み込みでネット通信が行われます。</p>
+              <p>📱 ホーム画面に追加してご利用の場合、アップデート後もすぐには最新版に切り替わらないことがあります。反映されない時は、アプリスイッチャーから一度完全に閉じて開き直すか、下のボタンで最新版を読み込み直せます。</p>
+              <button type="button" class="reload-latest-btn" onclick="reloadLatestVersion()">🔄 最新版を読み込み直す</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="x-footer-row">
+          <div class="x-footer-icons">
+            <a href="https://x.com/yuttyan4444" target="_blank" rel="noopener noreferrer" aria-label="XでYUCCHIをフォロー" data-tooltip="Xへ" class="x-icon-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.254 5.622L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/>
+              </svg>
+            </a>
+            <a href="https://webkorisu.github.io/yucchis-portal/" target="_blank" rel="noopener noreferrer" aria-label="✿ YUCCHIのアプリ一覧を開く" data-tooltip="アプリ一覧へ" class="x-icon-btn">
+              <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12.74 1.67 L22 10 L22 20.5 Q22 22 20.5 22 L14.5 22 L14.5 15 L9.5 15 L9.5 22 L3.5 22 Q2 22 2 20.5 L2 10 L11.26 1.67 Q12 1 12.74 1.67 Z"/>
+              </svg>
+            </a>
+          </div>
+          <div class="last-updated">最終更新：2026.10.15</div>
+        </div>
+
       </div>
     </div>
-  </div>
-
-  <div class="x-footer-row">
-    <div class="x-footer-icons">
-      <a href="https://x.com/yuttyan4444" target="_blank" rel="noopener noreferrer" aria-label="XでYUCCHIをフォロー" data-tooltip="Xへ" class="x-icon-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.254 5.622L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/>
-        </svg>
-      </a>
-      <a href="https://webkorisu.github.io/yucchis-portal/" target="_blank" rel="noopener noreferrer" aria-label="✿ YUCCHIのアプリ一覧を開く" data-tooltip="アプリ一覧へ" class="x-icon-btn">
-        <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12.74 1.67 L22 10 L22 20.5 Q22 22 20.5 22 L14.5 22 L14.5 15 L9.5 15 L9.5 22 L3.5 22 Q2 22 2 20.5 L2 10 L11.26 1.67 Q12 1 12.74 1.67 Z"/>
-        </svg>
-      </a>
-    </div>
-    <div class="last-updated">最終更新：2026.10.15</div>
-  </div>
+  </aside>
 </div>
 
 <script>
@@ -467,7 +650,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
 
   /* ---------- 設定値 ---------- */
   const COLORS = ['#F4ACB7', '#D9808F', '#E8B4BC', '#D4C6E2', '#B8DCD4', '#F4E8B8', '#FFFFFF', '#5E464C'];
-  const BG_COLORS = ['#FFE8E8', '#F5D4D4', '#F4ACB7', '#E8D6D7', '#C9E4DE', '#D4E2E9', '#D4C6E2', '#F4E8B8', '#FFFFFF'];
+  const BG_COLORS = ['#FFFFFF', '#F3EFEE', '#DDD8D6', '#FFE8E8', '#F5D4D4', '#F4ACB7', '#C9E4DE', '#D4E2E9', '#D4C6E2', '#F4E8B8', '#5E464C'];
   const SAFE = { top: 0.10, bottom: 0.78, right: 0.85, rightFrom: 0.45 };   // ショートで隠れやすい場所の目安
   const FONTS = [
     { key: 'zen', label: 'Zen Maru Gothic（やわらかい日本語）', stack: '"Zen Maru Gothic", sans-serif', weight: 700, fams: ['Zen Maru Gothic'], hint: '日本語・英語どちらもOK' },
@@ -477,15 +660,20 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   ];
   const TOOL_HINTS = {
     select: '置いたものをタップで選べます。選んだものは、ドラッグで動かせます。',
-    circle: '動画の上をタップすると、ふんわり丸が置かれます。',
-    caption: '動画の上をタップすると、テロップが置かれます。'
+    circle: '動画の上をタップすると、リングが置かれます（続けて置けます）。置いたリングはドラッグで動かせます。',
+    arrow: '動画の上をタップすると、タップした場所を指す矢印が置かれます（続けて置けます）。しっぽの白い丸をドラッグすると、向きと長さを変えられます。',
+    caption: '動画の上をタップすると、テロップが置かれます（続けて置けます）。置いたものはドラッグで動かせます。'
   };
-  const DECO = [[.12, .06, .05], [.86, .09, .04], [.07, .94, .045], [.9, .92, .055], [.5, .035, .03], [.5, .965, .035], [.05, .5, .03], [.95, .5, .03]];
 
+  const isPc = !!(window.matchMedia && window.matchMedia('(pointer: fine)').matches);
   const state = {
-    orient: 'portrait', fit: 'contain', quality: 720, bg: '#FFE8E8', vscale: 0.92, vpos: 0.5, card: true, guide: true,
+    orient: 'portrait', fit: 'contain', quality: isPc ? 1080 : 720, bg: '#FFE8E8',
+    vscale: 0.92, vpos: 0.5, card: true, guide: true,
+    defCircle: { shape: 'soft', color: '#F4ACB7', size: 0.09, width: 0.013 },
+    defArrow: { shape: 'line', color: '#F4ACB7', len: 0.18, width: 0.013, bend: 0.45, angle: 35 },
+    defCaption: { style: 'band', font: 'zen', size: 0.06, bg: '#FFFFFF', fg: '#5E464C', align: 'left', tdx: -0.06, tdy: 0.16, tb: null },
     items: [], selId: null, tool: 'select', nextId: 1,
-    dur: 0, hasVideo: false
+    dur: 0, hasVideo: false, trimIn: 0, trimOut: 0, ff: [], ffStart: null, ffRate: 4, nextFf: 1
   };
   let exporting = false, cancelFlag = false, interrupted = false;
   const bounds = {};   // テロップの当たり判定（px）
@@ -519,61 +707,158 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     if (!keep) msg._t = setTimeout(() => { el.hidden = true; }, 6000);
   }
 
+  /* ---------- パネルの開け閉め ---------- */
+  const accs = [].slice.call(document.querySelectorAll('.acc'));
+  function openAcc(id) {
+    accs.forEach(a => a.classList.toggle('open', a.id === id));
+  }
+  accs.forEach(a => a.querySelector('.acc-head').addEventListener('click', () => {
+    if (a.classList.contains('open')) a.classList.remove('open'); else openAcc(a.id);
+  }));
+  const head = $('panelHead'), card = $('panelCard');
+  let compactTimer = 0;
+  function startCompactTimer() {
+    clearTimeout(compactTimer); head.classList.remove('compact');
+    compactTimer = setTimeout(() => head.classList.add('compact'), 3000);
+  }
+  function togglePanel() {
+    const c = card.classList.toggle('collapsed');
+    $('phToggle').textContent = c ? '＋' : '−';
+    if (!c) startCompactTimer();
+  }
+  head.addEventListener('click', togglePanel);
+  head.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePanel(); } });
+  startCompactTimer();
+
   /* ---------- フォント読み込み ---------- */
   function loadItemFont(it) {
     const f = fontOf(it.font), text = it.text || 'あ';
     return Promise.all(f.fams.map(n => document.fonts.load(f.weight + ' 32px "' + n + '"', text).catch(() => {})));
   }
 
-  /* ---------- 描画 ---------- */
+  /* ---------- 画面の大きさに合わせてプレビューを整える ---------- */
+  function fitCanvas() {
+    const st = $('stage');
+    const aw = st.clientWidth - 20, ah = st.clientHeight - 20;
+    if (aw <= 0 || ah <= 0) return;
+    const ratio = canvas.width / canvas.height;
+    let w = aw, h = w / ratio;
+    if (h > ah) { h = ah; w = h * ratio; }
+    canvas.style.width = Math.floor(w) + 'px';
+    canvas.style.height = Math.floor(h) + 'px';
+  }
   function setCanvasSize() {
     const d = dims();
     if (canvas.width !== d.W) canvas.width = d.W;
     if (canvas.height !== d.H) canvas.height = d.H;
+    fitCanvas();
+  }
+  if (window.ResizeObserver) new ResizeObserver(fitCanvas).observe($('stage'));
+  window.addEventListener('resize', fitCanvas);
+
+  /* ---------- 動画の置き場所と、丸・テロップの位置 ---------- */
+  function vrect(W, H) {
+    if (state.hasVideo && video.videoWidth) {
+      const vw = video.videoWidth, vh = video.videoHeight;
+      const s = (state.fit === 'contain' ? Math.min(W / vw, H / vh) : Math.max(W / vw, H / vh)) * state.vscale;
+      const dw = vw * s, dh = vh * s;
+      return { x: (W - dw) / 2, y: (H - dh) * state.vpos, w: dw, h: dh };
+    }
+    return { x: 0, y: 0, w: W, h: H };
+  }
+  // 丸は「動画の中の位置」で持つ（動画を動かしても、丸がついていく）
+  function itemPx(it, W, H) {
+    if (it.type === 'circle' || it.type === 'arrow') { const v = vrect(W, H); return { x: v.x + it.x * v.w, y: v.y + it.y * v.h }; }
+    return { x: it.x * W, y: it.y * H };
+  }
+  function setItemFromPx(it, px, py, W, H) {
+    if (it.type === 'circle' || it.type === 'arrow') { const v = vrect(W, H); it.x = (px - v.x) / v.w; it.y = (py - v.y) / v.h; }
+    else { it.x = px / W; it.y = py / H; }
   }
 
+  /* ---------- 描画 ---------- */
   function visibleAt(it, t) { return t >= it.t0 && t < it.t1; }
+  // 止めているあいだ（編集中）は、ふわっと出る動きをやめて、いつも完成の見た目で表示する
+  const still = () => !exporting && video.paused;
   function fade(t, it) {
+    if (still()) return 1;
     const f = 0.35;
     const a = clamp(Math.min((t - it.t0) / f, (it.t1 - t) / f), 0, 1);
     return a * a * (3 - 2 * a);
   }
 
-  function drawDeco(W, H, base) {
-    const col = lum(state.bg) > 0.97 ? '#F5D4D4' : 'rgba(255,255,255,.6)';
+  function drawCircle(it, t, W, H, base) {
+    const a = fade(t, it);
+    const pop = still() ? 1 : ease((t - it.t0) / 0.45);
+    const breathe = still() ? 1 : 1 + 0.035 * Math.sin((t - it.t0) * 2 * Math.PI / 1.8);
+    const r = base * it.size * (0.6 + 0.4 * pop) * breathe;
+    const c = itemPx(it, W, H), x = c.x, y = c.y;
     ctx.save();
-    ctx.fillStyle = col; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    DECO.forEach(d => {
-      ctx.font = (base * d[2] * 1.6) + 'px "Cormorant Garamond","Zen Maru Gothic",serif';
-      ctx.fillText('✿', d[0] * W, d[1] * H);
-    });
+    ctx.globalAlpha = a;
+    const shape = it.shape === 'solid' || it.shape === 'dashed' ? it.shape : 'soft';
+    const lw = Math.max(3, base * (it.width || 0.013));
+    // ふんわり（外側のぼかし）
+    if (shape === 'soft') {
+      const g = ctx.createRadialGradient(x, y, r * 0.7, x, y, r * 1.6);
+      g.addColorStop(0, rgba(it.color, 0));
+      g.addColorStop(0.333, rgba(it.color, 0.6));
+      g.addColorStop(1, rgba(it.color, 0));
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, y, r * 1.6, 0, Math.PI * 2); ctx.fill();
+    }
+    // 線（白いふち＋うっすら濃い縁＋色。ピンクの上でも見えるように）
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+    if (shape === 'dashed') { ctx.setLineDash([lw * 2.6, lw * 2.4]); ctx.lineCap = 'round'; }
+    ctx.lineWidth = lw * 2.4; ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.stroke();
+    ctx.lineWidth = lw * 1.5; ctx.strokeStyle = rgba(mix(it.color, '#5E464C', 0.5), 0.55); ctx.stroke();
+    ctx.lineWidth = lw; ctx.strokeStyle = it.color; ctx.stroke();
     ctx.restore();
   }
 
-  function drawCircle(it, t, W, H, base) {
-    const a = fade(t, it);
-    const pop = ease((t - it.t0) / 0.45);
-    const breathe = 1 + 0.035 * Math.sin((t - it.t0) * 2 * Math.PI / 1.8);
-    const r = base * it.size * (0.6 + 0.4 * pop) * breathe;
-    const x = it.x * W, y = it.y * H;
+  // 矢印：しるしの先（tip）が置いた場所。angle は「矢印が向いている方向」（0度＝右、90度＝下）
+  function arrowGeom(it, W, H, base, k) {
+    const c = itemPx(it, W, H), a = (it.angle || 0) * Math.PI / 180;
+    const dx = Math.cos(a), dy = Math.sin(a), L = base * it.len * (k == null ? 1 : k);
+    const T = { x: c.x, y: c.y }, S = { x: c.x - dx * L, y: c.y - dy * L };
+    let C = null, tx = dx, ty = dy;
+    if (it.shape === 'curve') {
+      const bend = it.bend == null ? 0.45 : it.bend;
+      C = { x: (S.x + T.x) / 2 - dy * L * bend * 0.5, y: (S.y + T.y) / 2 + dx * L * bend * 0.5 };
+      const vx = T.x - C.x, vy = T.y - C.y, n = Math.hypot(vx, vy) || 1;
+      tx = vx / n; ty = vy / n;
+    }
+    return { T: T, S: S, C: C, tx: tx, ty: ty, L: L };
+  }
+  function arrowPoints(g) {
+    const pts = [];
+    for (let i = 0; i <= 16; i++) {
+      const t = i / 16;
+      if (g.C) { const u = 1 - t; pts.push({ x: u * u * g.S.x + 2 * u * t * g.C.x + t * t * g.T.x, y: u * u * g.S.y + 2 * u * t * g.C.y + t * t * g.T.y }); }
+      else pts.push({ x: g.S.x + (g.T.x - g.S.x) * t, y: g.S.y + (g.T.y - g.S.y) * t });
+    }
+    return pts;
+  }
+  function drawArrow(it, t, W, H, base) {
+    const a = fade(t, it), pop = still() ? 1 : ease((t - it.t0) / 0.45);
+    const g = arrowGeom(it, W, H, base, 0.7 + 0.3 * pop);
+    const lw = Math.max(3, base * (it.width || 0.013));
+    const hl = Math.max(base * 0.035, lw * 4.5), hw = hl * 0.62;
+    const bx = g.T.x - g.tx * hl, by = g.T.y - g.ty * hl;
+    const A = { x: bx - g.ty * hw, y: by + g.tx * hw }, B = { x: bx + g.ty * hw, y: by - g.tx * hw };
     ctx.save();
-    ctx.globalAlpha = a;
-    // 外側のふんわり
-    const g = ctx.createRadialGradient(x, y, r * 0.7, x, y, r * 1.6);
-    g.addColorStop(0, rgba(it.color, 0));
-    g.addColorStop(0.333, rgba(it.color, 0.6));
-    g.addColorStop(1, rgba(it.color, 0));
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(x, y, r * 1.6, 0, Math.PI * 2); ctx.fill();
-    // 内側のくっきり（どんな背景でも見えるよう、うっすら濃い縁つき）
-    const lw = Math.max(3, base * 0.011);
-    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.lineWidth = lw + base * 0.007;
-    ctx.strokeStyle = rgba(mix(it.color, '#5E464C', 0.45), 0.4);
-    ctx.stroke();
-    ctx.lineWidth = lw;
-    ctx.strokeStyle = it.color;
-    ctx.stroke();
+    ctx.globalAlpha = a; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    const pass = (w, col) => {
+      ctx.strokeStyle = col; ctx.lineWidth = w;
+      ctx.beginPath(); ctx.moveTo(g.S.x, g.S.y);
+      if (g.C) ctx.quadraticCurveTo(g.C.x, g.C.y, g.T.x, g.T.y); else ctx.lineTo(g.T.x, g.T.y);
+      ctx.setLineDash(it.shape === 'dashed' ? [0.1, lw * 2.4] : []);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(g.T.x, g.T.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+    };
+    pass(lw * 2.4, 'rgba(255,255,255,.85)');
+    pass(lw * 1.6, rgba(mix(it.color, '#5E464C', 0.5), 0.55));
+    pass(lw, it.color);
     ctx.restore();
   }
 
@@ -586,28 +871,61 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     ctx.font = f.weight + ' ' + fs + 'px ' + f.stack;
     const maxOf = () => Math.max.apply(null, lines.map(l => ctx.measureText(l || ' ').width));
     let maxw = maxOf();
-    const padXr = it.style === 'band' ? 0.55 : 0.2;
+    const boxed = it.style !== 'outline';
+    const padXr = boxed ? 0.55 : 0.2;
     if (maxw + fs * padXr * 2 > W * 0.94) {
       fs = fs * (W * 0.94) / (maxw + fs * padXr * 2);
       ctx.font = f.weight + ' ' + fs + 'px ' + f.stack;
       maxw = maxOf();
     }
     const lh = fs * 1.38, textH = lh * lines.length;
-    const dy = (1 - ease((t - it.t0) / 0.4)) * fs * 0.35;
+    const dy = still() ? 0 : (1 - ease((t - it.t0) / 0.4)) * fs * 0.35;
     const cx = it.x * W, cy = it.y * H + dy;
-    const padX = fs * padXr, padY = it.style === 'band' ? fs * 0.32 : fs * 0.12;
+    const padX = fs * padXr, padY = boxed ? fs * 0.32 : fs * 0.12;
     const bw = maxw + padX * 2, bh = textH + padY * 2;
-    bounds[it.id] = { x: cx - bw / 2, y: it.y * H - bh / 2, w: bw, h: bh };
+    bounds[it.id] = { x: cx - bw / 2, y: it.y * H - bh / 2, w: bw, h: bh, tip: { x: cx + (it.tdx || 0) * base, y: it.y * H + (it.tdy || 0) * base } };
     const left = it.align === 'left';
     const tx = left ? cx - bw / 2 + padX : cx;
     ctx.textAlign = left ? 'left' : 'center'; ctx.textBaseline = 'middle';
-    if (it.style === 'band') {
+    if (boxed) {
       ctx.shadowColor = 'rgba(94,70,76,.22)'; ctx.shadowBlur = fs * 0.35; ctx.shadowOffsetY = fs * 0.1;
       rr(ctx, cx - bw / 2, cy - bh / 2, bw, bh, fs * 0.65);
       ctx.fillStyle = rgba(it.bg, 0.94); ctx.fill();
       ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
       ctx.lineWidth = Math.max(2, fs * 0.04);
       ctx.strokeStyle = rgba(mix(it.bg, '#5E464C', 0.25), 0.55); ctx.stroke();
+      if (it.style === 'bubble') {
+        // 吹き出しのしっぽ：箱の中心からしっぽの先に向かう線が、箱のふちを通る場所から出す
+        const tipx = cx + (it.tdx || 0) * base, tipy = cy + (it.tdy || 0) * base;
+        const hx = bw / 2, hy = bh / 2, vx = tipx - cx, vy = tipy - cy;
+        if (Math.abs(vx) > hx || Math.abs(vy) > hy) {
+          const tX = hx / Math.max(Math.abs(vx), 1e-6), tY = hy / Math.max(Math.abs(vy), 1e-6);
+          const vertEdge = tX < tY, tt = Math.min(tX, tY);
+          const rad = Math.min(fs * 0.65, hx, hy);
+          const wb = Math.min(fs * 0.95, (vertEdge ? bh : bw) * 0.45);
+          const cl = (v, c, half) => { const m = Math.max(0, half); return clamp(v, c - m, c + m); };
+          let ex = cx + vx * tt, ey = cy + vy * tt, nx, ny, tnx, tny, rng;
+          if (vertEdge) {
+            nx = vx > 0 ? 1 : -1; ny = 0; tnx = 0; tny = 1;
+            rng = Math.max(0.0001, hy - rad - wb / 2);
+            ey = it.tb != null ? cy + it.tb * rng : cl(ey, cy, rng);
+          } else {
+            nx = 0; ny = vy > 0 ? 1 : -1; tnx = 1; tny = 0;
+            rng = Math.max(0.0001, hx - rad - wb / 2);
+            ex = it.tb != null ? cx + it.tb * rng : cl(ex, cx, rng);
+          }
+          bounds[it.id].base = { x: ex, y: ey, vert: vertEdge, cx: cx, cy: cy, rng: rng };
+          const ins = Math.max(2, fs * 0.04) * 1.5;
+          const B1 = { x: ex + tnx * wb / 2, y: ey + tny * wb / 2 }, B2 = { x: ex - tnx * wb / 2, y: ey - tny * wb / 2 };
+          ctx.beginPath();
+          ctx.moveTo(B1.x - nx * ins, B1.y - ny * ins); ctx.lineTo(B1.x, B1.y); ctx.lineTo(tipx, tipy); ctx.lineTo(B2.x, B2.y); ctx.lineTo(B2.x - nx * ins, B2.y - ny * ins);
+          ctx.closePath();
+          ctx.fillStyle = rgba(it.bg, 0.94); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(B1.x, B1.y); ctx.lineTo(tipx, tipy); ctx.lineTo(B2.x, B2.y);
+          ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(2, fs * 0.04);
+          ctx.strokeStyle = rgba(mix(it.bg, '#5E464C', 0.25), 0.55); ctx.stroke();
+        }
+      }
       ctx.fillStyle = it.fg;
       lines.forEach((l, i) => ctx.fillText(l, tx, cy - textH / 2 + lh * (i + 0.5)));
     } else {
@@ -629,12 +947,30 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
       ctx.lineWidth = base * 0.006; ctx.strokeStyle = '#D9808F'; fn(); ctx.stroke();
     };
     if (it.type === 'circle') {
-      const r = base * it.size * 1.3;
-      ring(() => { ctx.beginPath(); ctx.arc(it.x * W, it.y * H, r, 0, Math.PI * 2); });
+      const r = base * it.size * 1.3, c = itemPx(it, W, H);
+      ring(() => { ctx.beginPath(); ctx.arc(c.x, c.y, r, 0, Math.PI * 2); });
+    } else if (it.type === 'arrow') {
+      const g = arrowGeom(it, W, H, base, 1);
+      ring(() => { ctx.beginPath(); ctx.arc(g.T.x, g.T.y, base * 0.03, 0, Math.PI * 2); });
+      ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(g.S.x, g.S.y, base * 0.02, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFFFFF'; ctx.fill();
+      ctx.lineWidth = base * 0.007; ctx.strokeStyle = '#D9808F'; ctx.stroke();
     } else {
       const b = bounds[it.id]; if (!b) { ctx.restore(); return; }
       const p = base * 0.012;
       ring(() => rr(ctx, b.x - p, b.y - p, b.w + p * 2, b.h + p * 2, base * 0.02));
+      if (it.style === 'bubble' && b.tip) {
+        ctx.setLineDash([]);
+        ctx.beginPath(); ctx.arc(b.tip.x, b.tip.y, base * 0.02, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFFFFF'; ctx.fill();
+        ctx.lineWidth = base * 0.007; ctx.strokeStyle = '#D9808F'; ctx.stroke();
+        if (b.base) {
+          ctx.beginPath(); ctx.arc(b.base.x, b.base.y, base * 0.013, 0, Math.PI * 2);
+          ctx.fillStyle = '#D9808F'; ctx.fill();
+          ctx.lineWidth = base * 0.005; ctx.strokeStyle = '#FFFFFF'; ctx.stroke();
+        }
+      }
     }
     ctx.restore();
   }
@@ -644,11 +980,17 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     const W = canvas.width, H = canvas.height, base = Math.min(W, H);
     let l, r, t, b;
     if (it.type === 'circle') {
-      const rad = base * it.size;
-      l = it.x * W - rad; r = it.x * W + rad; t = it.y * H - rad; b = it.y * H + rad;
+      const rad = base * it.size, c = itemPx(it, W, H);
+      l = c.x - rad; r = c.x + rad; t = c.y - rad; b = c.y + rad;
+    } else if (it.type === 'arrow') {
+      const g = arrowGeom(it, W, H, base, 1), m = base * 0.03;
+      l = Math.min(g.S.x, g.T.x) - m; r = Math.max(g.S.x, g.T.x) + m; t = Math.min(g.S.y, g.T.y) - m; b = Math.max(g.S.y, g.T.y) + m;
     } else {
       const bb = bounds[it.id];
-      if (bb) { l = bb.x; r = bb.x + bb.w; t = bb.y; b = bb.y + bb.h; }
+      if (bb) {
+        l = bb.x; r = bb.x + bb.w; t = bb.y; b = bb.y + bb.h;
+        if (it.style === 'bubble' && bb.tip) { l = Math.min(l, bb.tip.x); r = Math.max(r, bb.tip.x); t = Math.min(t, bb.tip.y); b = Math.max(b, bb.tip.y); }
+      }
       else { l = r = it.x * W; t = b = it.y * H; }
     }
     return t < H * SAFE.top || b > H * SAFE.bottom || (r > W * SAFE.right && b > H * SAFE.rightFrom);
@@ -682,12 +1024,11 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     const t = video.currentTime || 0;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalAlpha = 1;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';   // 画面録画の文字をくっきりさせる
     ctx.fillStyle = state.bg; ctx.fillRect(0, 0, W, H);
-    drawDeco(W, H, base);
     if (state.hasVideo && video.videoWidth) {
-      const vw = video.videoWidth, vh = video.videoHeight;
-      const s = (state.fit === 'contain' ? Math.min(W / vw, H / vh) : Math.max(W / vw, H / vh)) * state.vscale;
-      const dw = vw * s, dh = vh * s, dx = (W - dw) / 2, dy = (H - dh) * state.vpos;
+      const v = vrect(W, H), dx = v.x, dy = v.y, dw = v.w, dh = v.h;
       if (state.card) {
         const p = base * 0.03, cr = base * 0.04;
         ctx.save();
@@ -709,19 +1050,45 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     }
     state.items.forEach(it => {
       if (!visibleAt(it, t)) return;
-      if (it.type === 'circle') drawCircle(it, t, W, H, base); else drawCaption(it, t, W, H, base);
+      if (it.type === 'circle') drawCircle(it, t, W, H, base);
+      else if (it.type === 'arrow') drawArrow(it, t, W, H, base);
+      else drawCaption(it, t, W, H, base);
     });
     if (!exporting && state.guide && state.orient === 'portrait') drawGuide(W, H, base);
+    if (!exporting && state.hasVideo && rateAt(t) > 1) {
+      const label = '早送り ×' + rateAt(t), fsz = base * 0.032;
+      ctx.save();
+      ctx.font = '700 ' + fsz + 'px "Zen Maru Gothic",sans-serif';
+      const tw = ctx.measureText(label).width, px0 = base * 0.03, py0 = base * 0.03;
+      rr(ctx, px0, py0, tw + fsz * 1.2, fsz * 1.9, fsz * 0.95);
+      ctx.fillStyle = 'rgba(94,70,76,.78)'; ctx.fill();
+      ctx.fillStyle = '#FFFFFF'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText(label, px0 + fsz * 0.6, py0 + fsz * 0.95);
+      ctx.restore();
+    }
     if (!exporting) {
       const s = sel();
       if (s && visibleAt(s, t)) drawSelection(s, W, H, base);
     }
   }
 
+  // 早送りの範囲にいるときの速さ（範囲の外は1倍）
+  function rateAt(t) {
+    for (let i = 0; i < state.ff.length; i++) { const f = state.ff[i]; if (t >= f.a && t < f.b) return f.rate; }
+    return 1;
+  }
   let raf = 0;
   function requestDraw() { if (!raf) raf = requestAnimationFrame(tick); }
   function tick() {
     raf = 0;
+    // 使う範囲の終わりまで来たら止める（書き出し中は、書き出しの側で止める）
+    if (!exporting && !video.paused && state.hasVideo && state.trimOut > 0 && video.currentTime >= state.trimOut - 0.02) {
+      video.pause(); video.currentTime = state.trimOut;
+    }
+    if (state.hasVideo) {
+      const want = rateAt(video.currentTime || 0);
+      if (video.playbackRate !== want) video.playbackRate = want;
+    }
     updateTimeUI();
     render();
     updateWarn();
@@ -734,9 +1101,16 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     if (document.activeElement !== $('seek')) $('seek').value = t;
     $('ph').style.left = (state.dur ? (t / state.dur * 100) : 0) + '%';
     if (exporting) {
-      $('progBar').style.width = (state.dur ? clamp(t / state.dur * 100, 0, 100) : 0) + '%';
-      $('progText').textContent = '書き出し中… ' + fmt(t) + ' / ' + fmt(state.dur) + '（画面はこのまま開いておいてね）';
+      const len = Math.max(0.1, state.trimOut - state.trimIn);
+      $('progBar').style.width = clamp((t - state.trimIn) / len * 100, 0, 100) + '%';
+      $('progText').textContent = '書き出し中… ' + fmt(Math.max(0, t - state.trimIn)) + ' / ' + fmt(len) + '（画面はこのまま開いておいてね）';
     }
+  }
+  function updateTrimUI() {
+    $('trimLbl').textContent = fmt(state.trimIn) + ' 〜 ' + fmt(state.trimOut) + '（' + Math.max(0, state.trimOut - state.trimIn).toFixed(1) + '秒）';
+    const D = state.dur || 1;
+    $('shL').style.width = (state.trimIn / D * 100) + '%';
+    $('shR').style.left = (state.trimOut / D * 100) + '%';
   }
 
   /* ---------- 動画の読み込み・再生 ---------- */
@@ -750,9 +1124,11 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     $('fname').textContent = f.name;
     msg('');
   });
-  video.addEventListener('loadedmetadata', () => {
+  function onReady() {
     state.dur = video.duration || 0;
     state.hasVideo = true;
+    state.trimIn = 0; state.trimOut = state.dur;
+    state.ff = []; state.ffStart = null;
     $('seek').max = state.dur;
     // 向きは動画に合わせて自動でえらぶ（あとで変えられます）
     state.orient = video.videoHeight >= video.videoWidth ? 'portrait' : 'landscape';
@@ -760,10 +1136,23 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     video.currentTime = 0;
     state.items.forEach(it => { it.t0 = clamp(it.t0, 0, state.dur); it.t1 = clamp(it.t1, 0, state.dur); });
     renderAll();
+  }
+  video.addEventListener('loadedmetadata', () => {
+    if (video.duration === Infinity) {
+      // 長さが分からない動画（一部の録画ファイル）は、いちど最後までとんで長さを調べる
+      const fix = () => {
+        if (isFinite(video.duration)) { video.removeEventListener('timeupdate', fix); video.currentTime = 0; onReady(); }
+      };
+      video.addEventListener('timeupdate', fix);
+      video.currentTime = 1e7;
+      return;
+    }
+    onReady();
   });
   video.addEventListener('error', () => {
     state.hasVideo = false;
-    msg('この動画は読み込めませんでした。iPadの画面収録（MP4/MOV）で試してみてください。', true);
+    msg('この動画は読み込めませんでした。MP4で試してみてください。', true);
+    openAcc('acc-export');
     requestDraw();
   });
   ['seeked', 'loadeddata', 'timeupdate'].forEach(ev => video.addEventListener(ev, requestDraw));
@@ -772,9 +1161,9 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   video.addEventListener('ended', () => { $('playBtn').textContent = '再生'; requestDraw(); });
 
   $('playBtn').addEventListener('click', () => {
-    if (!state.hasVideo) { msg('先に動画をえらんでください'); return; }
+    if (!state.hasVideo) { msg('先に動画をえらんでください'); openAcc('acc-video'); return; }
     if (video.paused) {
-      if (video.ended || video.currentTime >= state.dur - 0.05) video.currentTime = 0;
+      if (video.ended || video.currentTime < state.trimIn || video.currentTime >= state.trimOut - 0.05) video.currentTime = state.trimIn;
       video.play().catch(() => msg('再生できませんでした。もう一度押してみてください。'));
     } else video.pause();
   });
@@ -797,6 +1186,65 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
       setTimeout(done, 1500);
     });
   }
+
+  /* ---------- 使う範囲（前後カット） ---------- */
+  $('btnTrimIn').addEventListener('click', () => {
+    if (!state.hasVideo) return;
+    state.trimIn = clamp(video.currentTime || 0, 0, Math.max(0, state.trimOut - 0.3)); updateTrimUI();
+  });
+  $('btnTrimOut').addEventListener('click', () => {
+    if (!state.hasVideo) return;
+    state.trimOut = clamp(video.currentTime || 0, Math.min(state.dur, state.trimIn + 0.3), state.dur); updateTrimUI();
+  });
+  $('btnTrimReset').addEventListener('click', () => {
+    if (!state.hasVideo) return;
+    state.trimIn = 0; state.trimOut = state.dur; updateTrimUI();
+  });
+
+  /* ---------- 早送り（範囲を決めて、2倍・4倍・8倍） ---------- */
+  let ffNote = '';
+  function outLen() {
+    let len = Math.max(0, state.trimOut - state.trimIn);
+    state.ff.forEach(f => {
+      const a = Math.max(f.a, state.trimIn), b = Math.min(f.b, state.trimOut);
+      if (b > a) len -= (b - a) * (1 - 1 / f.rate);
+    });
+    return len;
+  }
+  function updateFfUI() {
+    const box = $('ffList'); box.innerHTML = '';
+    state.ff.slice().sort((x, y) => x.a - y.a).forEach(f => {
+      const wrap = document.createElement('span');
+      wrap.className = 'row'; wrap.style.gap = '4px'; wrap.style.flexWrap = 'nowrap';
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn chip'; b.textContent = fmt(f.a) + ' 〜 ' + fmt(f.b);
+      b.addEventListener('click', () => { video.pause(); video.currentTime = f.a; requestDraw(); });
+      const r = document.createElement('button');
+      r.type = 'button'; r.className = 'btn small on'; r.textContent = f.rate + '倍'; r.setAttribute('aria-label', '速さを変える');
+      r.addEventListener('click', () => { f.rate = f.rate === 2 ? 4 : (f.rate === 4 ? 8 : 2); ffNote = ''; renderAll(); });
+      const x = document.createElement('button');
+      x.type = 'button'; x.className = 'btn small danger'; x.textContent = '×'; x.setAttribute('aria-label', 'この早送りを消す');
+      x.addEventListener('click', () => { state.ff = state.ff.filter(q => q.id !== f.id); ffNote = ''; renderAll(); });
+      wrap.appendChild(b); wrap.appendChild(r); wrap.appendChild(x); box.appendChild(wrap);
+    });
+    $('ffState').textContent = ffNote || (state.ffStart != null ? '早送りの始まり：' + fmt(state.ffStart) + '（終わりの位置で「ここまでを早送りにする」を押してください）' : '');
+    $('ffInfo').textContent = state.ff.length ? '書き出しの長さ：約 ' + fmt(outLen()) + '（使う範囲は ' + fmt(Math.max(0, state.trimOut - state.trimIn)) + '）' : '';
+  }
+  const syncFfRate = bindSeg('segFfRate', () => state.ffRate, v => { state.ffRate = parseInt(v, 10); });
+  syncFfRate();
+  $('btnFfStart').addEventListener('click', () => {
+    if (!state.hasVideo) return;
+    state.ffStart = video.currentTime || 0; ffNote = ''; updateFfUI();
+  });
+  $('btnFfEnd').addEventListener('click', () => {
+    if (!state.hasVideo) return;
+    if (state.ffStart == null) { ffNote = '先に「ここから早送り」を押してください。'; updateFfUI(); return; }
+    const a = state.ffStart, b = video.currentTime || 0;
+    if (b < a + 0.3) { ffNote = '終わりの位置は、始まりより0.3秒以上あとにしてください。'; updateFfUI(); return; }
+    if (state.ff.some(f => a < f.b && b > f.a)) { ffNote = 'ほかの早送りと重なっています。位置を変えるか、先に消してください。'; updateFfUI(); return; }
+    state.ff.push({ id: state.nextFf++, a: a, b: b, rate: state.ffRate });
+    state.ffStart = null; ffNote = ''; renderAll();
+  });
 
   /* ---------- 色の見本・切り替えボタン ---------- */
   function buildSw(id, colors, get, set) {
@@ -829,6 +1277,14 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   const syncTool = bindSeg('tools', () => state.tool, v => setTool(v));
   const syncStyle = bindSeg('segStyle', () => (sel() || {}).style, v => updateSel({ style: v }));
   const syncAlign = bindSeg('segAlign', () => (sel() || {}).align || 'center', v => updateSel({ align: v }));
+  const syncShape = bindSeg('segShape', () => (sel() || {}).shape || 'soft', v => updateSel({ shape: v }));
+  const WIDTHS = { thin: 0.008, mid: 0.013, thick: 0.022 };
+  const syncWidth = bindSeg('segWidth', () => {
+    const w = (sel() || {}).width || 0.013;
+    return Object.keys(WIDTHS).find(k => Math.abs(WIDTHS[k] - w) < 0.0006) || '';
+  }, v => updateSel({ width: WIDTHS[v] }));
+  const syncArrowShape = bindSeg('segArrowShape', () => (sel() || {}).shape, v => updateSel({ shape: v }));
+  const syncSwArrow = buildSw('swArrow', COLORS, () => (sel() || {}).color, c => updateSel({ color: c }));
   const syncSwCircle = buildSw('swCircle', COLORS, () => (sel() || {}).color, c => updateSel({ color: c }));
   const syncSwBand = buildSw('swBand', COLORS, () => (sel() || {}).bg, c => updateSel({ bg: c }));
   const syncSwText = buildSw('swText', COLORS, () => (sel() || {}).fg, c => updateSel({ fg: c }));
@@ -845,22 +1301,30 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   }
 
   /* ---------- 丸・テロップの追加と編集 ---------- */
+  function pick(id) {
+    state.selId = id;
+    if (id !== null) openAcc('acc-edit');
+    renderAll();
+  }
   function addItem(type, p) {
+    const W = canvas.width, H = canvas.height;
     const t = video.currentTime || 0, d = type === 'circle' ? 2.5 : 3;
-    let t1 = Math.min(state.dur, t + d), t0 = t;
+    const t1 = Math.min(state.dur, t + d);
+    let t0 = t;
     if (t1 - t0 < 0.5) t0 = Math.max(0, t1 - 0.5);
     const it = { id: state.nextId++, type: type, x: p.x, y: p.y, t0: t0, t1: t1 };
-    if (type === 'circle') { it.color = '#F4ACB7'; it.size = 0.09; }
-    else { it.text = 'ここがポイント！'; it.align = 'left'; it.style = 'band'; it.font = 'zen'; it.size = 0.06; it.bg = '#FFFFFF'; it.fg = '#5E464C'; }
-    state.items.push(it); state.selId = it.id;
+    if (type === 'circle') { Object.assign(it, state.defCircle); setItemFromPx(it, p.x * W, p.y * H, W, H); }
+    else if (type === 'arrow') { Object.assign(it, state.defArrow); setItemFromPx(it, p.x * W, p.y * H, W, H); }
+    else { Object.assign(it, state.defCaption); it.text = 'ここがポイント！'; }
+    state.items.push(it);
     if (type === 'caption') loadItemFont(it).then(requestDraw);
-    renderAll();
+    pick(it.id);
   }
   function updateSel(patch) {
     const it = sel(); if (!it) return;
     Object.assign(it, patch);
     if (it.type === 'caption') loadItemFont(it).then(requestDraw);
-    renderAll(true);
+    renderAll();
   }
   function setTime(which, v) {
     const it = sel(); if (!it || isNaN(v)) return;
@@ -876,9 +1340,6 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     }
     renderAll();
   }
-  function select(id) {
-    state.selId = id; renderAll();
-  }
   function viewItem(it) {
     if (!state.hasVideo) return;
     video.pause();
@@ -891,17 +1352,41 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   $('btnT0').addEventListener('click', () => setTime('t0', video.currentTime || 0));
   $('btnT1').addEventListener('click', () => setTime('t1', video.currentTime || 0));
   $('fSizeC').addEventListener('input', e => updateSel({ size: parseFloat(e.target.value) }));
+  $('fWidth').addEventListener('input', e => updateSel({ width: parseFloat(e.target.value) }));
+  $('fLen').addEventListener('input', e => updateSel({ len: parseFloat(e.target.value) }));
+  $('fAngle').addEventListener('input', e => updateSel({ angle: parseFloat(e.target.value) }));
+  $('fBend').addEventListener('input', e => updateSel({ bend: parseFloat(e.target.value) }));
+  const rotate = (d) => { const it = sel(); if (it && it.type === 'arrow') updateSel({ angle: ((Math.round(it.angle || 0) + d) % 360 + 360) % 360 }); };
+  $('btnRotL').addEventListener('click', () => rotate(-15));
+  $('btnRotR').addEventListener('click', () => rotate(15));
+  $('btnRot180').addEventListener('click', () => rotate(180));
   $('fSizeT').addEventListener('input', e => updateSel({ size: parseFloat(e.target.value) }));
   $('fText').addEventListener('input', e => updateSel({ text: e.target.value }));
   fontSel.addEventListener('change', e => updateSel({ font: e.target.value }));
+  function setTail(dir) {
+    const it = sel(); if (!it || it.type !== 'caption') return;
+    const base = Math.min(canvas.width, canvas.height), b = bounds[it.id] || { w: base * 0.5, h: base * 0.1 }, gap = 0.09;
+    let tdx = 0, tdy = 0;
+    if (dir === 'down') { tdx = -b.w * 0.2 / base; tdy = b.h / 2 / base + gap; }
+    if (dir === 'up') { tdx = -b.w * 0.2 / base; tdy = -(b.h / 2 / base + gap); }
+    if (dir === 'left') { tdx = -(b.w / 2 / base + gap); }
+    if (dir === 'right') { tdx = b.w / 2 / base + gap; }
+    updateSel({ tdx: clamp(tdx, -0.8, 0.8), tdy: clamp(tdy, -0.8, 0.8), tb: null });
+  }
+  $('fTb').addEventListener('input', e => updateSel({ tb: parseFloat(e.target.value) }));
+  $('btnTbAuto').addEventListener('click', () => updateSel({ tb: null }));
+  $('btnTailDown').addEventListener('click', () => setTail('down'));
+  $('btnTailUp').addEventListener('click', () => setTail('up'));
+  $('btnTailLeft').addEventListener('click', () => setTail('left'));
+  $('btnTailRight').addEventListener('click', () => setTail('right'));
   $('btnView').addEventListener('click', () => { const it = sel(); if (it) viewItem(it); });
   $('btnDel').addEventListener('click', () => {
     state.items = state.items.filter(i => i.id !== state.selId); state.selId = null; renderAll();
   });
   $('btnDup').addEventListener('click', () => {
     const it = sel(); if (!it) return;
-    const c = Object.assign({}, it, { id: state.nextId++, x: clamp(it.x + 0.04, 0, 1), y: clamp(it.y + 0.04, 0, 1) });
-    state.items.push(c); state.selId = c.id; renderAll();
+    const c = Object.assign({}, it, { id: state.nextId++, x: clamp(it.x + 0.04, -0.2, 1.2), y: clamp(it.y + 0.04, -0.2, 1.2) });
+    state.items.push(c); pick(c.id);
   });
 
   /* ---------- 画面の更新 ---------- */
@@ -909,17 +1394,33 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     const it = sel();
     $('edEmpty').hidden = !!it; $('edBody').hidden = !it;
     if (!it) return;
-    $('edTitle').textContent = it.type === 'circle' ? 'ふんわり丸' : 'テロップ';
+    $('edTitle').textContent = it.type === 'circle' ? 'リング' : (it.type === 'arrow' ? '矢印' : 'テロップ');
     if (document.activeElement !== $('fT0')) $('fT0').value = it.t0.toFixed(1);
     if (document.activeElement !== $('fT1')) $('fT1').value = it.t1.toFixed(1);
     $('fT0').max = $('fT1').max = state.dur;
     $('grpCircle').hidden = it.type !== 'circle';
+    $('grpArrow').hidden = it.type !== 'arrow';
+    $('grpWidth').hidden = it.type === 'caption';
     $('grpCaption').hidden = it.type !== 'caption';
+    if (it.type !== 'caption') { $('fWidth').value = it.width || 0.013; syncWidth(); }
     if (it.type === 'circle') {
-      $('fSizeC').value = it.size; syncSwCircle();
+      $('fSizeC').value = it.size; syncShape(); syncSwCircle();
+    } else if (it.type === 'arrow') {
+      $('fLen').value = it.len; $('fAngle').value = Math.round(it.angle || 0);
+      $('angLbl').textContent = Math.round(it.angle || 0) + '°';
+      $('fBend').value = it.bend == null ? 0.45 : it.bend; $('rowBend').hidden = it.shape !== 'curve';
+      syncArrowShape(); syncSwArrow();
     } else {
       if (document.activeElement !== $('fText')) $('fText').value = it.text;
       fontSel.value = it.font; $('fontHint').textContent = fontOf(it.font).hint;
+      $('rowBubble').hidden = it.style !== 'bubble';
+      if (it.style === 'bubble') {
+        const bs = (bounds[it.id] || {}).base;
+        let tv = it.tb;
+        if (tv == null) tv = bs ? clamp((bs.vert ? bs.y - bs.cy : bs.x - bs.cx) / bs.rng, -1, 1) : 0;
+        $('fTb').value = tv;
+        $('tbLbl').textContent = it.tb == null ? '（いまは自動）' : '（手動）';
+      }
       $('fSizeT').value = it.size; syncStyle(); syncAlign(); syncSwBand(); syncSwText();
     }
   }
@@ -930,16 +1431,22 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     list.forEach(it => {
       const b = document.createElement('button');
       b.type = 'button'; b.className = 'btn chip' + (it.id === state.selId ? ' on' : '');
-      const label = it.type === 'circle' ? '丸' : 'テロップ「' + (String(it.text || '').replace(/\n/g, ' ').slice(0, 10) || '…') + '」';
+      const label = it.type === 'circle' ? 'リング' : it.type === 'arrow' ? '矢印' : 'テロップ「' + (String(it.text || '').replace(/\n/g, ' ').slice(0, 10) || '…') + '」';
       b.textContent = fmt(it.t0) + '  ' + label + (isUnsafe(it) ? '（隠れやすい）' : '');
-      b.addEventListener('click', () => { state.selId = it.id; viewItem(it); renderAll(); });
+      b.addEventListener('click', () => { viewItem(it); pick(it.id); });
       box.appendChild(b);
     });
   }
   function renderStrip() {
     const strip = $('strip');
-    [].slice.call(strip.querySelectorAll('.bar')).forEach(n => n.remove());
+    [].slice.call(strip.querySelectorAll('.bar, .ffb')).forEach(n => n.remove());
     const D = state.dur || 1;
+    state.ff.forEach(f => {
+      const d = document.createElement('div');
+      d.className = 'ffb'; d.title = '早送り ×' + f.rate;
+      d.style.left = (f.a / D * 100) + '%'; d.style.width = Math.max(0.5, (f.b - f.a) / D * 100) + '%';
+      strip.appendChild(d);
+    });
     const list = state.items.slice().sort((a, b) => a.t0 - b.t0);
     const laneEnd = [];
     list.forEach(it => {
@@ -951,10 +1458,10 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
       b.style.left = (it.t0 / D * 100) + '%';
       b.style.width = Math.max(1.5, (it.t1 - it.t0) / D * 100) + '%';
       b.style.top = (4 + lane * 11) + 'px';
-      b.style.background = it.type === 'circle' ? it.color : it.bg;
-      b.setAttribute('aria-label', it.type === 'circle' ? '丸' : 'テロップ');
+      b.style.background = it.type === 'caption' ? it.bg : it.color;
+      b.setAttribute('aria-label', it.type === 'circle' ? 'リング' : it.type === 'arrow' ? '矢印' : 'テロップ');
       b.addEventListener('pointerdown', ev => ev.stopPropagation());
-      b.addEventListener('click', () => { state.selId = it.id; viewItem(it); renderAll(); });
+      b.addEventListener('click', () => { viewItem(it); pick(it.id); });
       strip.appendChild(b);
     });
     strip.style.height = (Math.max(1, laneEnd.length) * 11 + 6) + 'px';
@@ -967,9 +1474,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     requestDraw();
   });
   function renderAll() {
-    renderChips(); renderStrip(); syncEditor();
-    $('guideHint').hidden = !(state.orient === 'portrait' && state.guide);
-    requestDraw();
+    renderChips(); renderStrip(); syncEditor(); updateTrimUI(); updateFfUI(); requestDraw();
   }
 
   /* ---------- キャンバスのタップ・ドラッグ ---------- */
@@ -980,13 +1485,16 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   }
   function hitTest(p) {
     const W = canvas.width, H = canvas.height, base = Math.min(W, H), t = video.currentTime || 0;
+    const px = p.x * W, py = p.y * H;
     for (let i = state.items.length - 1; i >= 0; i--) {
       const it = state.items[i];
       if (!visibleAt(it, t)) continue;
-      const px = p.x * W, py = p.y * H;
       if (it.type === 'circle') {
-        const r = Math.max(base * it.size * 1.4, base * 0.05);
-        if (Math.hypot(px - it.x * W, py - it.y * H) <= r) return it;
+        const r = Math.max(base * it.size * 1.4, base * 0.05), c = itemPx(it, W, H);
+        if (Math.hypot(px - c.x, py - c.y) <= r) return it;
+      } else if (it.type === 'arrow') {
+        const g = arrowGeom(it, W, H, base, 1), tol = Math.max(base * 0.035, base * (it.width || 0.013) * 2.5);
+        if (arrowPoints(g).some(q => Math.hypot(px - q.x, py - q.y) <= tol)) return it;
       } else {
         const b = bounds[it.id], pad = base * 0.03;
         if (b && px >= b.x - pad && px <= b.x + b.w + pad && py >= b.y - pad && py <= b.y + b.h + pad) return it;
@@ -996,23 +1504,72 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   }
   canvas.addEventListener('pointerdown', (e) => {
     if (exporting) return;
+    const W = canvas.width, H = canvas.height;
     const p = toNorm(e);
-    if (state.tool !== 'select') {
-      if (!state.hasVideo) { msg('先に動画をえらんでください'); return; }
-      addItem(state.tool, p); setTool('select'); return;
+    // 選んでいる矢印の「しっぽの丸」をつかんだら、向きと長さを変える
+    const cur = sel();
+    if (cur && cur.type === 'arrow' && visibleAt(cur, video.currentTime || 0)) {
+      const base0 = Math.min(W, H), g0 = arrowGeom(cur, W, H, base0, 1);
+      if (Math.hypot(p.x * W - g0.S.x, p.y * H - g0.S.y) <= base0 * 0.045) {
+        drag = { id: cur.id, mode: 'tail' };
+        try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* 無視 */ }
+        return;
+      }
+    }
+    if (cur && cur.type === 'caption' && cur.style === 'bubble' && bounds[cur.id] && bounds[cur.id].tip && visibleAt(cur, video.currentTime || 0)) {
+      const base1 = Math.min(W, H), tip1 = bounds[cur.id].tip, bs = bounds[cur.id].base;
+      if (bs && Math.hypot(p.x * W - bs.x, p.y * H - bs.y) <= base1 * 0.035 && Math.hypot(p.x * W - tip1.x, p.y * H - tip1.y) > base1 * 0.045) {
+        drag = { id: cur.id, mode: 'bubbleBase' };
+        try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* 無視 */ }
+        return;
+      }
+      if (Math.hypot(p.x * W - tip1.x, p.y * H - tip1.y) <= base1 * 0.045) {
+        drag = { id: cur.id, mode: 'bubble' };
+        try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* 無視 */ }
+        return;
+      }
     }
     const hit = hitTest(p);
     if (hit) {
-      if (state.selId !== hit.id) { state.selId = hit.id; renderAll(); }
-      drag = { id: hit.id, dx: hit.x - p.x, dy: hit.y - p.y };
+      // 置いたものに触れたら、どの道具でも「えらぶ・動かす」になる
+      if (state.selId !== hit.id) pick(hit.id);
+      const c = itemPx(hit, W, H);
+      drag = { id: hit.id, dx: c.x - p.x * W, dy: c.y - p.y * H };
       try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* 無視 */ }
-    } else if (state.selId !== null) { select(null); }
+      return;
+    }
+    if (state.tool !== 'select') {
+      if (!state.hasVideo) { msg('先に動画をえらんでください'); openAcc('acc-video'); return; }
+      addItem(state.tool, p);   // 置いたあとも、道具はそのまま（続けて置けます）
+      return;
+    }
+    if (state.selId !== null) pick(null);
   });
   canvas.addEventListener('pointermove', (e) => {
     if (!drag) return;
     const it = state.items.find(i => i.id === drag.id); if (!it) return;
-    const p = toNorm(e);
-    it.x = clamp(p.x + drag.dx, 0, 1); it.y = clamp(p.y + drag.dy, 0, 1);
+    const W = canvas.width, H = canvas.height, p = toNorm(e);
+    if (drag.mode === 'bubbleBase') {
+      const bs = bounds[it.id] && bounds[it.id].base;
+      if (bs) { it.tb = clamp((bs.vert ? (p.y * H - bs.cy) : (p.x * W - bs.cx)) / bs.rng, -1, 1); syncEditor(); }
+      requestDraw(); return;
+    }
+    if (drag.mode === 'bubble') {
+      const base = Math.min(W, H);
+      it.tdx = clamp((p.x * W - it.x * W) / base, -0.8, 0.8);
+      it.tdy = clamp((p.y * H - it.y * H) / base, -0.8, 0.8);
+      requestDraw(); return;
+    }
+    if (drag.mode === 'tail') {
+      const base = Math.min(W, H), c = itemPx(it, W, H), vx = p.x * W - c.x, vy = p.y * H - c.y, n = Math.hypot(vx, vy);
+      if (n > base * 0.03) {
+        it.angle = ((Math.atan2(-vy, -vx) * 180 / Math.PI) % 360 + 360) % 360;
+        it.len = clamp(n / base, 0.05, 0.6);
+        syncEditor();
+      }
+      requestDraw(); return;
+    }
+    setItemFromPx(it, clamp(p.x * W + drag.dx, 0, W), clamp(p.y * H + drag.dy, 0, H), W, H);
     requestDraw();
   });
   ['pointerup', 'pointercancel'].forEach(ev => canvas.addEventListener(ev, () => { drag = null; }));
@@ -1063,18 +1620,19 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     if (risky) msg(risky + '個が、ショートで隠れやすい位置にあります。（このまま書き出します）', true);
     video.pause();
     state.selId = null; renderChips(); renderStrip(); syncEditor();
+    openAcc('acc-export');
     setExportUI(true);
     let wake = null, rec = null;
     try {
       await Promise.all(state.items.filter(i => i.type === 'caption').map(loadItemFont));
-      await seekTo(0);
+      await seekTo(state.trimIn);
       let audioTrack = null;
       try { audioTrack = await setupAudio(); } catch (e) { audioTrack = null; }
       render();
       const stream = canvas.captureStream(30);
       if (audioTrack) stream.addTrack(audioTrack);
       const mime = pickMime();
-      const opts = { videoBitsPerSecond: state.quality >= 1080 ? 8000000 : 5000000 };
+      const opts = { videoBitsPerSecond: state.quality >= 1080 ? 16000000 : 8000000 };
       if (mime) opts.mimeType = mime;
       rec = new MediaRecorder(stream, opts);
       const chunks = [];
@@ -1082,15 +1640,16 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
       const stopped = new Promise(res => { rec.onstop = res; });
       try { if (navigator.wakeLock) wake = await navigator.wakeLock.request('screen'); } catch (e) { wake = null; }
       rec.start(500);
-      const ended = new Promise(res => {
-        const done = () => { video.removeEventListener('ended', done); res(); };
-        video.addEventListener('ended', done);
-        const poll = setInterval(() => { if (cancelFlag || !exporting) { clearInterval(poll); done(); } }, 300);
-        video.addEventListener('ended', () => clearInterval(poll));
+      const reached = new Promise(res => {
+        const poll = setInterval(() => {
+          if (cancelFlag || video.ended || video.currentTime >= state.trimOut - 0.02) { clearInterval(poll); res(); }
+        }, 40);
       });
       await video.play();
       requestDraw();
-      await ended;
+      await reached;
+      video.pause();
+      render();
       await new Promise(r => setTimeout(r, 400));
       if (rec.state !== 'inactive') rec.stop();
       await stopped;
@@ -1120,20 +1679,138 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     } finally {
       try { if (wake) wake.release(); } catch (e) { /* 無視 */ }
       video.pause();
+      video.playbackRate = 1;
       if (monitor) monitor.gain.value = 1;
       setExportUI(false);
-      await seekTo(0);
+      await seekTo(state.trimIn);
       renderAll();
     }
   }
   $('exportBtn').addEventListener('click', doExport);
   $('cancelBtn').addEventListener('click', () => { cancelFlag = true; });
 
+  /* ---------- よく使う丸・テロップ（この端末のブラウザに保存） ---------- */
+  const PRESET_KEY = 'yucchi_videoPointerCaption_presets_v1';
+  const HEX = /^#[0-9a-fA-F]{6}$/;
+  const SHAPE_NAMES = { soft: 'ふんわり二重', solid: '実線', dashed: '点線' };
+  const ARROW_NAMES = { line: '直線', curve: 'カーブ', dashed: '点線' };
+  const presets = { circle: [], arrow: [], caption: [] };
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  function cleanCircle(p) {
+    if (!p || !SHAPE_NAMES[p.shape] || !HEX.test(p.color)) return null;
+    return { shape: p.shape, color: p.color, size: clamp(+p.size || 0.09, 0.04, 0.25), width: clamp(+p.width || 0.013, 0.006, 0.03) };
+  }
+  function cleanArrow(p) {
+    if (!p || !ARROW_NAMES[p.shape] || !HEX.test(p.color)) return null;
+    return { shape: p.shape, color: p.color, len: clamp(+p.len || 0.18, 0.05, 0.6), width: clamp(+p.width || 0.013, 0.006, 0.03),
+      bend: clamp(p.bend == null ? 0.45 : +p.bend, -0.9, 0.9), angle: ((Math.round(+p.angle || 0) % 360) + 360) % 360 };
+  }
+  function cleanCaption(p) {
+    if (!p || ['band', 'outline', 'bubble'].indexOf(p.style) < 0 || !FONTS.some(f => f.key === p.font) || !HEX.test(p.bg) || !HEX.test(p.fg)) return null;
+    return { style: p.style, font: p.font, size: clamp(+p.size || 0.06, 0.03, 0.12), bg: p.bg, fg: p.fg, align: p.align === 'center' ? 'center' : 'left',
+      tdx: clamp(p.tdx == null ? -0.06 : +p.tdx, -0.8, 0.8), tdy: clamp(p.tdy == null ? 0.16 : +p.tdy, -0.8, 0.8),
+      tb: p.tb == null ? null : clamp(+p.tb, -1, 1) };
+  }
+  const INIT_CIRCLE = cleanCircle(state.defCircle), INIT_ARROW = cleanArrow(state.defArrow), INIT_CAPTION = cleanCaption(state.defCaption);
+  let storageOk = true;
+  function loadPresets() {
+    try {
+      const raw = localStorage.getItem(PRESET_KEY); if (!raw) return;
+      const o = JSON.parse(raw);
+      presets.circle = (o.circle || []).map(cleanCircle).filter(Boolean).slice(0, 12);
+      presets.arrow = (o.arrow || []).map(cleanArrow).filter(Boolean).slice(0, 12);
+      presets.caption = (o.caption || []).map(cleanCaption).filter(Boolean).slice(0, 12);
+    } catch (e) { /* 読めないときは空のまま */ }
+  }
+  function savePresets() {
+    try { localStorage.setItem(PRESET_KEY, JSON.stringify(presets)); storageOk = true; } catch (e) { storageOk = false; }
+  }
+  function circleThumb(p) {
+    const w = Math.max(2, p.width * 150);
+    const dash = p.shape === 'dashed' ? ' stroke-dasharray="' + (w * 2) + ' ' + (w * 1.8) + '" stroke-linecap="round"' : '';
+    const halo = p.shape === 'soft' ? '<circle cx="17" cy="17" r="10" fill="none" stroke="' + p.color + '" stroke-width="9" opacity=".28"/>' : '';
+    return '<svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" style="vertical-align:middle;margin-right:6px;">' + halo +
+      '<circle cx="17" cy="17" r="10" fill="none" stroke="#5E464C" stroke-opacity=".35" stroke-width="' + (w + 1.5) + '"' + dash + '/>' +
+      '<circle cx="17" cy="17" r="10" fill="none" stroke="' + p.color + '" stroke-width="' + w + '"' + dash + '/></svg>';
+  }
+  function arrowThumb(p) {
+    const w = Math.max(2, p.width * 150);
+    const dash = p.shape === 'dashed' ? ' stroke-dasharray="0.1 ' + (w * 2.4) + '"' : '';
+    const d = p.shape === 'curve' ? 'M5 26Q8 6 27 9' : 'M5 27L27 8';
+    const h = p.shape === 'curve' ? 'M18.3 12.6L27 9L19.9 2.8' : 'M24.2 17L27 8L17.6 9.4';
+    const g = (col, sw, op) => '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-opacity="' + op + '" stroke-width="' + sw + '" stroke-linecap="round"' + dash + '/>' +
+      '<path d="' + h + '" fill="none" stroke="' + col + '" stroke-opacity="' + op + '" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round"/>';
+    return '<svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" style="vertical-align:middle;margin-right:6px;">' + g('#5E464C', w + 1.5, 0.35) + g(p.color, w, 1) + '</svg>';
+  }
+  function arrowLabel(p) { return ARROW_NAMES[p.shape] + '・' + (p.width < 0.0105 ? '細め' : (p.width > 0.0175 ? '太め' : 'ふつう')); }
+  function circleLabel(p) { return SHAPE_NAMES[p.shape] + '・' + (p.width < 0.0105 ? '細め' : (p.width > 0.0175 ? '太め' : 'ふつう')); }
+  function captionThumb(p) {
+    const f = fontOf(p.font), el = document.createElement('span');
+    el.textContent = 'ポイント';
+    const st = el.style;
+    st.fontFamily = f.stack; st.fontWeight = f.weight; st.fontSize = '12px'; st.color = p.fg; st.marginRight = '6px';
+    if (p.style !== 'outline') { st.background = p.bg; st.padding = '1px 8px 3px'; st.borderRadius = p.style === 'bubble' ? '8px 8px 8px 2px' : '999px'; st.border = '1px solid rgba(94,70,76,.25)'; }
+    else { st.webkitTextStroke = '3px ' + p.bg; st.paintOrder = 'stroke fill'; }
+    return el;
+  }
+  function captionLabel(p) { return (p.style === 'band' ? '帯つき' : (p.style === 'bubble' ? '吹き出し' : '文字だけ')) + '・' + f2(p.font); }
+  function f2(k) { return fontOf(k).label.split('（')[0]; }
+
+  function renderFavGroup(type, boxId, emptyId) {
+    const box = $(boxId); box.innerHTML = '';
+    const list = presets[type], cur = type === 'circle' ? state.defCircle : (type === 'arrow' ? state.defArrow : state.defCaption);
+    $(emptyId).hidden = list.length > 0;
+    list.forEach((p, i) => {
+      const wrap = document.createElement('span');
+      wrap.className = 'row'; wrap.style.gap = '4px'; wrap.style.flexWrap = 'nowrap';
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn chip' + (same(p, cur) ? ' on' : '');
+      if (type === 'circle') { b.innerHTML = circleThumb(p); b.appendChild(document.createTextNode(circleLabel(p))); }
+      else if (type === 'arrow') { b.innerHTML = arrowThumb(p); b.appendChild(document.createTextNode(arrowLabel(p))); }
+      else { b.appendChild(captionThumb(p)); b.appendChild(document.createTextNode(captionLabel(p))); }
+      b.addEventListener('click', () => usePreset(type, p));
+      const x = document.createElement('button');
+      x.type = 'button'; x.className = 'btn small danger'; x.textContent = '×'; x.setAttribute('aria-label', 'この保存を消す');
+      x.addEventListener('click', () => { presets[type].splice(i, 1); savePresets(); renderPresets(); });
+      wrap.appendChild(b); wrap.appendChild(x); box.appendChild(wrap);
+    });
+  }
+  function renderPresets() {
+    renderFavGroup('circle', 'favCircle', 'favCircleEmpty');
+    renderFavGroup('arrow', 'favArrow', 'favArrowEmpty');
+    renderFavGroup('caption', 'favCaption', 'favCaptionEmpty');
+    $('favNote').textContent = storageOk ? '' : 'この環境では、保存を残せませんでした（このページを開いている間だけ使えます）。';
+  }
+  function usePreset(type, p) {
+    if (type === 'circle') state.defCircle = Object.assign({}, p); else if (type === 'arrow') state.defArrow = Object.assign({}, p); else state.defCaption = Object.assign({}, p);
+    const it = sel();
+    if (it && it.type === type) {
+      Object.assign(it, p);
+      if (type === 'caption') loadItemFont(it).then(requestDraw);
+      renderAll();
+    } else setTool(type);
+    renderPresets();
+  }
+  function savePreset() {
+    const it = sel(); if (!it) return;
+    const st = it.type === 'circle' ? cleanCircle(it) : (it.type === 'arrow' ? cleanArrow(it) : cleanCaption(it));
+    if (!st) return;
+    const list = presets[it.type];
+    if (!list.some(q => same(q, st))) { list.push(st); if (list.length > 12) list.shift(); savePresets(); }
+    renderPresets(); openAcc('acc-fav');
+  }
+  $('btnFav').addEventListener('click', savePreset);
+  $('favResetC').addEventListener('click', () => { state.defCircle = Object.assign({}, INIT_CIRCLE); renderPresets(); });
+  $('favResetA').addEventListener('click', () => { state.defArrow = Object.assign({}, INIT_ARROW); renderPresets(); });
+  $('favResetT').addEventListener('click', () => { state.defCaption = Object.assign({}, INIT_CAPTION); renderPresets(); });
+  loadPresets(); renderPresets();
+
   /* ---------- はじめの状態 ---------- */
   setCanvasSize();
   setTool('select');
   syncControls();
   renderAll();
+  fitCanvas();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(requestDraw);
 })();
 </script>
