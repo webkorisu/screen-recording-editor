@@ -161,7 +161,6 @@
     .strip .ph { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--text); opacity: .7; pointer-events: none; }
     .strip .shade { position: absolute; top: 0; bottom: 0; background: rgba(94,70,76,.25); pointer-events: none; }
     .strip .ffb { position: absolute; top: 0; bottom: 0; background: rgba(244,200,90,.45); border-left: 1.5px solid rgba(180,130,30,.6); border-right: 1.5px solid rgba(180,130,30,.6); pointer-events: none; }
-    .tools-row { margin-top: 10px; }
 
     /* ---------- パネル ---------- */
     .panel-card { background: var(--surface); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
@@ -301,16 +300,6 @@
       <input type="range" id="seek" class="lock" min="0" max="0" step="0.01" value="0" style="margin-top:6px;" aria-label="再生位置">
       <div class="strip lock" id="strip"><div class="shade" id="shL" style="left:0;width:0;"></div><div class="shade" id="shR" style="right:0;left:100%;"></div><div class="ph" id="ph"></div></div>
 
-      <div class="row tools-row lock">
-        <span class="lbl" style="margin:0;">置くもの</span>
-        <div class="seg" id="tools">
-          <button type="button" class="btn small" data-v="select">えらぶ・動かす</button>
-          <button type="button" class="btn small" data-v="circle">リングを置く</button>
-          <button type="button" class="btn small" data-v="arrow">矢印を置く</button>
-          <button type="button" class="btn small" data-v="caption">テロップを置く</button>
-        </div>
-      </div>
-      <p class="hint" id="toolHint"></p>
     </div>
   </main>
 
@@ -411,21 +400,33 @@
 
         <!-- ③ 選んだもの -->
         <div class="acc lock" id="acc-edit">
-          <button type="button" class="acc-head"><span>③ 選んだもの</span><span class="acc-dots"></span><span class="acc-arrow">▼</span></button>
+          <button type="button" class="acc-head"><span>③ 置く・見た目</span><span class="acc-dots"></span><span class="acc-arrow">▼</span></button>
           <div class="acc-body">
-            <div id="edEmpty" class="hint" style="margin:0;">置いたリングや矢印、テロップをタップして選ぶと、ここで色・時間・文字などを変えられます。</div>
+            <div class="lbl" style="margin:0 0 6px;">置くもの</div>
+            <div class="seg" id="tools">
+              <button type="button" class="btn" data-v="select">えらぶ・動かす</button>
+              <button type="button" class="btn" data-v="circle">リングを置く</button>
+              <button type="button" class="btn" data-v="arrow">矢印を置く</button>
+              <button type="button" class="btn" data-v="caption">テロップを置く</button>
+            </div>
+            <p class="hint" id="toolHint"></p>
+            <div style="border-top:1px dotted var(--border);margin:10px 0;"></div>
+            <div id="edEmpty" class="hint" style="margin:0;">上の「リングを置く」などを押すと、置く前に見た目を選べます。置いたものをタップして選ぶと、ここで色・時間・文字などを変えられます。</div>
             <div id="edBody" hidden>
               <div class="row" style="justify-content:space-between;">
                 <strong id="edTitle" style="font-size:14px;letter-spacing:.06em;"></strong>
                 <span class="row">
+                  <button type="button" class="btn small" id="btnToTmpl" hidden>次に置く見た目へ</button>
                   <button type="button" class="btn small" id="btnView">ここを見る</button>
                   <button type="button" class="btn small" id="btnFav">よく使うに保存</button>
                   <button type="button" class="btn small" id="btnDup">コピー</button>
                   <button type="button" class="btn small danger" id="btnDel">消す</button>
                 </span>
               </div>
+              <div class="msg" id="edTmplNote" hidden style="margin-top:0;margin-bottom:8px;">これから置く見た目です。ここで選んでから、動画の上をタップして置けます。</div>
               <div class="msg" id="warnSel" hidden>ショートでは、この位置は文字や操作ボタンで隠れやすいです。もう少し内側に動かしてみてください。</div>
 
+              <div id="edTimes">
               <div class="lbl">出る時間（秒）</div>
               <div class="row">
                 <input type="number" id="fT0" step="0.1" min="0" inputmode="decimal" aria-label="出る時間">
@@ -435,6 +436,7 @@
               <div class="row">
                 <input type="number" id="fT1" step="0.1" min="0" inputmode="decimal" aria-label="消える時間">
                 <button type="button" class="btn small" id="btnT1">いまの位置にする</button>
+              </div>
               </div>
 
               <div id="grpCircle">
@@ -489,8 +491,10 @@
               </div>
 
               <div id="grpCaption">
+                <div id="fTextWrap">
                 <div class="lbl">文字（改行できます）</div>
                 <textarea id="fText" rows="2" maxlength="120"></textarea>
+                </div>
                 <div class="lbl">スタイル</div>
                 <div class="seg" id="segStyle">
                   <button type="button" class="btn" data-v="band">帯つき</button>
@@ -660,9 +664,9 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   ];
   const TOOL_HINTS = {
     select: '置いたものをタップで選べます。選んだものは、ドラッグで動かせます。',
-    circle: '動画の上をタップすると、リングが置かれます（続けて置けます）。置いたリングはドラッグで動かせます。',
-    arrow: '動画の上をタップすると、タップした場所を指す矢印が置かれます（続けて置けます）。しっぽの白い丸をドラッグすると、向きと長さを変えられます。',
-    caption: '動画の上をタップすると、テロップが置かれます（続けて置けます）。置いたものはドラッグで動かせます。'
+    circle: '下で見た目を選んで、動画の上をタップするとリングが置かれます（続けて置けます）。パソコンでは、置く前の見本がマウスについてきます。',
+    arrow: '下で見た目を選んで、動画の上をタップすると、タップした場所を指す矢印が置かれます（続けて置けます）。',
+    caption: '下で見た目を選んで、動画の上をタップするとテロップが置かれます（続けて置けます）。'
   };
 
   const isPc = !!(window.matchMedia && window.matchMedia('(pointer: fine)').matches);
@@ -709,8 +713,23 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
 
   /* ---------- パネルの開け閉め ---------- */
   const accs = [].slice.call(document.querySelectorAll('.acc'));
+  // 開いた項目の見出しが、いつも見える位置（パネルの一番上）にくるようにする
+  function scrollToAcc(a) {
+    if (window.matchMedia('(min-width: 900px)').matches) {
+      a.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    } else {
+      const sc = document.querySelector('.stage-col'), h = sc ? sc.offsetHeight : 0;
+      window.scrollTo({ top: Math.max(0, a.getBoundingClientRect().top + window.scrollY - h - 4), behavior: 'smooth' });
+    }
+  }
   function openAcc(id) {
-    accs.forEach(a => a.classList.toggle('open', a.id === id));
+    let opened = null;
+    accs.forEach(a => {
+      const was = a.classList.contains('open'), now = a.id === id;
+      a.classList.toggle('open', now);
+      if (now && !was) opened = a;       // 閉じていたものを開いたときだけ動かす（選ぶたびに動かないように）
+    });
+    if (opened) requestAnimationFrame(() => scrollToAcc(opened));
   }
   accs.forEach(a => a.querySelector('.acc-head').addEventListener('click', () => {
     if (a.classList.contains('open')) a.classList.remove('open'); else openAcc(a.id);
@@ -787,6 +806,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     return a * a * (3 - 2 * a);
   }
 
+  let hover = null, ghostK = 1;   // ghostK：マウスの位置に出すうすい見本用
   function drawCircle(it, t, W, H, base) {
     const a = fade(t, it);
     const pop = still() ? 1 : ease((t - it.t0) / 0.45);
@@ -794,7 +814,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     const r = base * it.size * (0.6 + 0.4 * pop) * breathe;
     const c = itemPx(it, W, H), x = c.x, y = c.y;
     ctx.save();
-    ctx.globalAlpha = a;
+    ctx.globalAlpha = a * ghostK;
     const shape = it.shape === 'solid' || it.shape === 'dashed' ? it.shape : 'soft';
     const lw = Math.max(3, base * (it.width || 0.013));
     // ふんわり（外側のぼかし）
@@ -846,7 +866,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     const bx = g.T.x - g.tx * hl, by = g.T.y - g.ty * hl;
     const A = { x: bx - g.ty * hw, y: by + g.tx * hw }, B = { x: bx + g.ty * hw, y: by - g.tx * hw };
     ctx.save();
-    ctx.globalAlpha = a; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.globalAlpha = a * ghostK; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     const pass = (w, col) => {
       ctx.strokeStyle = col; ctx.lineWidth = w;
       ctx.beginPath(); ctx.moveTo(g.S.x, g.S.y);
@@ -867,7 +887,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     const lines = String(it.text || '').split('\n');
     let fs = base * it.size;
     ctx.save();
-    ctx.globalAlpha = a;
+    ctx.globalAlpha = a * ghostK;
     ctx.font = f.weight + ' ' + fs + 'px ' + f.stack;
     const maxOf = () => Math.max.apply(null, lines.map(l => ctx.measureText(l || ' ').width));
     let maxw = maxOf();
@@ -941,27 +961,36 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
 
   function drawSelection(it, W, H, base) {
     ctx.save();
-    ctx.setLineDash([base * 0.015, base * 0.012]);
-    const ring = (fn) => {
-      ctx.lineWidth = base * 0.012; ctx.strokeStyle = 'rgba(255,255,255,.9)'; fn(); ctx.stroke();
-      ctx.lineWidth = base * 0.006; ctx.strokeStyle = '#D9808F'; fn(); ctx.stroke();
+    ctx.setLineDash([]);
+    // 選んでいるしるし：実線の四角＋角の小さな四角（点線のリングと見分けるため）
+    const box = (x, y, w, h, corners) => {
+      rr(ctx, x, y, w, h, base * 0.008);
+      ctx.lineWidth = base * 0.011; ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.stroke();
+      rr(ctx, x, y, w, h, base * 0.008);
+      ctx.lineWidth = base * 0.005; ctx.strokeStyle = '#D9808F'; ctx.stroke();
+      if (corners) {
+        const sz = base * 0.016;
+        [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].forEach(q => {
+          ctx.beginPath(); ctx.rect(q[0] - sz / 2, q[1] - sz / 2, sz, sz);
+          ctx.fillStyle = '#FFFFFF'; ctx.fill();
+          ctx.lineWidth = base * 0.004; ctx.strokeStyle = '#D9808F'; ctx.stroke();
+        });
+      }
     };
     if (it.type === 'circle') {
-      const r = base * it.size * 1.3, c = itemPx(it, W, H);
-      ring(() => { ctx.beginPath(); ctx.arc(c.x, c.y, r, 0, Math.PI * 2); });
+      const r = base * it.size * 1.35, c = itemPx(it, W, H);
+      box(c.x - r, c.y - r, r * 2, r * 2, true);
     } else if (it.type === 'arrow') {
-      const g = arrowGeom(it, W, H, base, 1);
-      ring(() => { ctx.beginPath(); ctx.arc(g.T.x, g.T.y, base * 0.03, 0, Math.PI * 2); });
-      ctx.setLineDash([]);
+      const g = arrowGeom(it, W, H, base, 1), m = base * 0.035;
+      box(g.T.x - m, g.T.y - m, m * 2, m * 2, false);
       ctx.beginPath(); ctx.arc(g.S.x, g.S.y, base * 0.02, 0, Math.PI * 2);
       ctx.fillStyle = '#FFFFFF'; ctx.fill();
       ctx.lineWidth = base * 0.007; ctx.strokeStyle = '#D9808F'; ctx.stroke();
     } else {
       const b = bounds[it.id]; if (!b) { ctx.restore(); return; }
-      const p = base * 0.012;
-      ring(() => rr(ctx, b.x - p, b.y - p, b.w + p * 2, b.h + p * 2, base * 0.02));
+      const pd = base * 0.012;
+      box(b.x - pd, b.y - pd, b.w + pd * 2, b.h + pd * 2, true);
       if (it.style === 'bubble' && b.tip) {
-        ctx.setLineDash([]);
         ctx.beginPath(); ctx.arc(b.tip.x, b.tip.y, base * 0.02, 0, Math.PI * 2);
         ctx.fillStyle = '#FFFFFF'; ctx.fill();
         ctx.lineWidth = base * 0.007; ctx.strokeStyle = '#D9808F'; ctx.stroke();
@@ -1054,6 +1083,14 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
       else if (it.type === 'arrow') drawArrow(it, t, W, H, base);
       else drawCaption(it, t, W, H, base);
     });
+    if (!exporting && hover && state.hasVideo && state.tool !== 'select') {
+      const gt = state.tool, gd = gt === 'circle' ? state.defCircle : (gt === 'arrow' ? state.defArrow : state.defCaption);
+      const gi = Object.assign({ id: -1, type: gt, x: hover.x, y: hover.y, t0: t - 1, t1: t + 1 }, gd);
+      if (gt !== 'caption') setItemFromPx(gi, hover.x * W, hover.y * H, W, H); else gi.text = 'ここがポイント！';
+      ghostK = 0.55;
+      if (gt === 'circle') drawCircle(gi, t, W, H, base); else if (gt === 'arrow') drawArrow(gi, t, W, H, base); else drawCaption(gi, t, W, H, base);
+      ghostK = 1;
+    }
     if (!exporting && state.guide && state.orient === 'portrait') drawGuide(W, H, base);
     if (!exporting && state.hasVideo && rateAt(t) > 1) {
       const label = '早送り ×' + rateAt(t), fsz = base * 0.032;
@@ -1136,6 +1173,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     video.currentTime = 0;
     state.items.forEach(it => { it.t0 = clamp(it.t0, 0, state.dur); it.t1 = clamp(it.t1, 0, state.dur); });
     renderAll();
+    openAcc('acc-edit');
   }
   video.addEventListener('loadedmetadata', () => {
     if (video.duration === Infinity) {
@@ -1275,19 +1313,19 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   $('vScale').addEventListener('input', e => { state.vscale = parseFloat(e.target.value); requestDraw(); });
   $('vPos').addEventListener('input', e => { state.vpos = parseFloat(e.target.value); requestDraw(); });
   const syncTool = bindSeg('tools', () => state.tool, v => setTool(v));
-  const syncStyle = bindSeg('segStyle', () => (sel() || {}).style, v => updateSel({ style: v }));
-  const syncAlign = bindSeg('segAlign', () => (sel() || {}).align || 'center', v => updateSel({ align: v }));
-  const syncShape = bindSeg('segShape', () => (sel() || {}).shape || 'soft', v => updateSel({ shape: v }));
+  const syncStyle = bindSeg('segStyle', () => (editObj() || {}).style, v => updateSel({ style: v }));
+  const syncAlign = bindSeg('segAlign', () => (editObj() || {}).align || 'center', v => updateSel({ align: v }));
+  const syncShape = bindSeg('segShape', () => (editObj() || {}).shape || 'soft', v => updateSel({ shape: v }));
   const WIDTHS = { thin: 0.008, mid: 0.013, thick: 0.022 };
   const syncWidth = bindSeg('segWidth', () => {
-    const w = (sel() || {}).width || 0.013;
+    const w = (editObj() || {}).width || 0.013;
     return Object.keys(WIDTHS).find(k => Math.abs(WIDTHS[k] - w) < 0.0006) || '';
   }, v => updateSel({ width: WIDTHS[v] }));
-  const syncArrowShape = bindSeg('segArrowShape', () => (sel() || {}).shape, v => updateSel({ shape: v }));
-  const syncSwArrow = buildSw('swArrow', COLORS, () => (sel() || {}).color, c => updateSel({ color: c }));
-  const syncSwCircle = buildSw('swCircle', COLORS, () => (sel() || {}).color, c => updateSel({ color: c }));
-  const syncSwBand = buildSw('swBand', COLORS, () => (sel() || {}).bg, c => updateSel({ bg: c }));
-  const syncSwText = buildSw('swText', COLORS, () => (sel() || {}).fg, c => updateSel({ fg: c }));
+  const syncArrowShape = bindSeg('segArrowShape', () => (editObj() || {}).shape, v => updateSel({ shape: v }));
+  const syncSwArrow = buildSw('swArrow', COLORS, () => (editObj() || {}).color, c => updateSel({ color: c }));
+  const syncSwCircle = buildSw('swCircle', COLORS, () => (editObj() || {}).color, c => updateSel({ color: c }));
+  const syncSwBand = buildSw('swBand', COLORS, () => (editObj() || {}).bg, c => updateSel({ bg: c }));
+  const syncSwText = buildSw('swText', COLORS, () => (editObj() || {}).fg, c => updateSel({ fg: c }));
 
   const fontSel = $('fFont');
   FONTS.forEach(f => { const o = document.createElement('option'); o.value = f.key; o.textContent = f.label; fontSel.appendChild(o); });
@@ -1298,6 +1336,8 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     state.tool = v; syncTool();
     $('toolHint').textContent = TOOL_HINTS[v];
     canvas.style.cursor = v === 'select' ? 'default' : 'crosshair';
+    if (v !== 'select') { state.selId = null; openAcc('acc-edit'); } else if (hover) hover = null;
+    renderAll();
   }
 
   /* ---------- 丸・テロップの追加と編集 ---------- */
@@ -1320,8 +1360,24 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     if (type === 'caption') loadItemFont(it).then(requestDraw);
     pick(it.id);
   }
+  // 選んでいるものがなければ、「次に置くもの」の見た目を編集する
+  function editObj() {
+    const it = sel(); if (it) return it;
+    if (state.tool === 'circle') return Object.assign({ type: 'circle' }, state.defCircle);
+    if (state.tool === 'arrow') return Object.assign({ type: 'arrow' }, state.defArrow);
+    if (state.tool === 'caption') return Object.assign({ type: 'caption' }, state.defCaption);
+    return null;
+  }
+  const isTmpl = () => !sel() && state.tool !== 'select';
   function updateSel(patch) {
-    const it = sel(); if (!it) return;
+    const it = sel();
+    if (!it) {
+      const d = state.tool === 'circle' ? state.defCircle : (state.tool === 'arrow' ? state.defArrow : (state.tool === 'caption' ? state.defCaption : null));
+      if (!d) return;
+      Object.assign(d, patch);
+      if (state.tool === 'caption') loadItemFont({ font: d.font, text: 'ここがポイント！' }).then(requestDraw);
+      renderAll(); renderPresets(); return;
+    }
     Object.assign(it, patch);
     if (it.type === 'caption') loadItemFont(it).then(requestDraw);
     renderAll();
@@ -1356,7 +1412,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   $('fLen').addEventListener('input', e => updateSel({ len: parseFloat(e.target.value) }));
   $('fAngle').addEventListener('input', e => updateSel({ angle: parseFloat(e.target.value) }));
   $('fBend').addEventListener('input', e => updateSel({ bend: parseFloat(e.target.value) }));
-  const rotate = (d) => { const it = sel(); if (it && it.type === 'arrow') updateSel({ angle: ((Math.round(it.angle || 0) + d) % 360 + 360) % 360 }); };
+  const rotate = (d) => { const it = editObj(); if (it && it.type === 'arrow') updateSel({ angle: ((Math.round(it.angle || 0) + d) % 360 + 360) % 360 }); };
   $('btnRotL').addEventListener('click', () => rotate(-15));
   $('btnRotR').addEventListener('click', () => rotate(15));
   $('btnRot180').addEventListener('click', () => rotate(180));
@@ -1364,7 +1420,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   $('fText').addEventListener('input', e => updateSel({ text: e.target.value }));
   fontSel.addEventListener('change', e => updateSel({ font: e.target.value }));
   function setTail(dir) {
-    const it = sel(); if (!it || it.type !== 'caption') return;
+    const it = editObj(); if (!it || it.type !== 'caption') return;
     const base = Math.min(canvas.width, canvas.height), b = bounds[it.id] || { w: base * 0.5, h: base * 0.1 }, gap = 0.09;
     let tdx = 0, tdy = 0;
     if (dir === 'down') { tdx = -b.w * 0.2 / base; tdy = b.h / 2 / base + gap; }
@@ -1379,6 +1435,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   $('btnTailUp').addEventListener('click', () => setTail('up'));
   $('btnTailLeft').addEventListener('click', () => setTail('left'));
   $('btnTailRight').addEventListener('click', () => setTail('right'));
+  $('btnToTmpl').addEventListener('click', () => { state.selId = null; renderAll(); });
   $('btnView').addEventListener('click', () => { const it = sel(); if (it) viewItem(it); });
   $('btnDel').addEventListener('click', () => {
     state.items = state.items.filter(i => i.id !== state.selId); state.selId = null; renderAll();
@@ -1390,14 +1447,31 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
   });
 
   /* ---------- 画面の更新 ---------- */
+  // かたちのボタンに、小さな見本の絵をつける（置く前でもイメージできるように）
+  function refreshShapeThumbs(it) {
+    if (it.type === 'circle') {
+      const bs = cleanCircle(it); if (!bs) return;
+      [].forEach.call($('segShape').querySelectorAll('button'), b => { b.innerHTML = circleThumb(Object.assign({}, bs, { shape: b.dataset.v })) + SHAPE_NAMES[b.dataset.v]; });
+    } else if (it.type === 'arrow') {
+      const bs = cleanArrow(it); if (!bs) return;
+      [].forEach.call($('segArrowShape').querySelectorAll('button'), b => { b.innerHTML = arrowThumb(Object.assign({}, bs, { shape: b.dataset.v })) + ARROW_NAMES[b.dataset.v]; });
+    }
+  }
   function syncEditor() {
-    const it = sel();
+    const it = editObj(), tmpl = isTmpl();
     $('edEmpty').hidden = !!it; $('edBody').hidden = !it;
     if (!it) return;
-    $('edTitle').textContent = it.type === 'circle' ? 'リング' : (it.type === 'arrow' ? '矢印' : 'テロップ');
-    if (document.activeElement !== $('fT0')) $('fT0').value = it.t0.toFixed(1);
-    if (document.activeElement !== $('fT1')) $('fT1').value = it.t1.toFixed(1);
-    $('fT0').max = $('fT1').max = state.dur;
+    $('edTitle').textContent = (tmpl ? '次に置く' : '') + (it.type === 'circle' ? 'リング' : (it.type === 'arrow' ? '矢印' : 'テロップ'));
+    $('edTmplNote').hidden = !tmpl;
+    $('edTimes').hidden = tmpl; $('fTextWrap').hidden = tmpl;
+    $('btnView').hidden = tmpl; $('btnDup').hidden = tmpl; $('btnDel').hidden = tmpl;
+    $('btnToTmpl').hidden = tmpl || state.tool === 'select';
+    if (!tmpl) {
+      if (document.activeElement !== $('fT0')) $('fT0').value = it.t0.toFixed(1);
+      if (document.activeElement !== $('fT1')) $('fT1').value = it.t1.toFixed(1);
+      $('fT0').max = $('fT1').max = state.dur;
+    }
+    refreshShapeThumbs(it);
     $('grpCircle').hidden = it.type !== 'circle';
     $('grpArrow').hidden = it.type !== 'arrow';
     $('grpWidth').hidden = it.type === 'caption';
@@ -1411,7 +1485,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
       $('fBend').value = it.bend == null ? 0.45 : it.bend; $('rowBend').hidden = it.shape !== 'curve';
       syncArrowShape(); syncSwArrow();
     } else {
-      if (document.activeElement !== $('fText')) $('fText').value = it.text;
+      if (document.activeElement !== $('fText')) $('fText').value = it.text || '';
       fontSel.value = it.font; $('fontHint').textContent = fontOf(it.font).hint;
       $('rowBubble').hidden = it.style !== 'bubble';
       if (it.style === 'bubble') {
@@ -1546,6 +1620,10 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     if (state.selId !== null) pick(null);
   });
   canvas.addEventListener('pointermove', (e) => {
+    if (!drag && !exporting && e.pointerType === 'mouse') {
+      if (state.tool !== 'select' && state.hasVideo) { hover = toNorm(e); requestDraw(); }
+      else if (hover) { hover = null; requestDraw(); }
+    }
     if (!drag) return;
     const it = state.items.find(i => i.id === drag.id); if (!it) return;
     const W = canvas.width, H = canvas.height, p = toNorm(e);
@@ -1572,6 +1650,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     setItemFromPx(it, clamp(p.x * W + drag.dx, 0, W), clamp(p.y * H + drag.dy, 0, H), W, H);
     requestDraw();
   });
+  canvas.addEventListener('pointerleave', () => { if (hover) { hover = null; requestDraw(); } });
   ['pointerup', 'pointercancel'].forEach(ev => canvas.addEventListener(ev, () => { drag = null; }));
 
   /* ---------- 書き出し ---------- */
@@ -1729,7 +1808,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     const w = Math.max(2, p.width * 150);
     const dash = p.shape === 'dashed' ? ' stroke-dasharray="' + (w * 2) + ' ' + (w * 1.8) + '" stroke-linecap="round"' : '';
     const halo = p.shape === 'soft' ? '<circle cx="17" cy="17" r="10" fill="none" stroke="' + p.color + '" stroke-width="9" opacity=".28"/>' : '';
-    return '<svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" style="vertical-align:middle;margin-right:6px;">' + halo +
+    return '<svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" style="vertical-align:middle;margin-right:6px;"><rect width="34" height="34" rx="8" fill="#fff"/>' + halo +
       '<circle cx="17" cy="17" r="10" fill="none" stroke="#5E464C" stroke-opacity=".35" stroke-width="' + (w + 1.5) + '"' + dash + '/>' +
       '<circle cx="17" cy="17" r="10" fill="none" stroke="' + p.color + '" stroke-width="' + w + '"' + dash + '/></svg>';
   }
@@ -1740,7 +1819,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     const h = p.shape === 'curve' ? 'M18.3 12.6L27 9L19.9 2.8' : 'M24.2 17L27 8L17.6 9.4';
     const g = (col, sw, op) => '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-opacity="' + op + '" stroke-width="' + sw + '" stroke-linecap="round"' + dash + '/>' +
       '<path d="' + h + '" fill="none" stroke="' + col + '" stroke-opacity="' + op + '" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round"/>';
-    return '<svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" style="vertical-align:middle;margin-right:6px;">' + g('#5E464C', w + 1.5, 0.35) + g(p.color, w, 1) + '</svg>';
+    return '<svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" style="vertical-align:middle;margin-right:6px;"><rect width="34" height="34" rx="8" fill="#fff"/>' + g('#5E464C', w + 1.5, 0.35) + g(p.color, w, 1) + '</svg>';
   }
   function arrowLabel(p) { return ARROW_NAMES[p.shape] + '・' + (p.width < 0.0105 ? '細め' : (p.width > 0.0175 ? '太め' : 'ふつう')); }
   function circleLabel(p) { return SHAPE_NAMES[p.shape] + '・' + (p.width < 0.0105 ? '細め' : (p.width > 0.0175 ? '太め' : 'ふつう')); }
@@ -1792,7 +1871,7 @@ function reloadLatestVersion() { location.href = location.pathname + '?v=' + Dat
     renderPresets();
   }
   function savePreset() {
-    const it = sel(); if (!it) return;
+    const it = editObj(); if (!it) return;
     const st = it.type === 'circle' ? cleanCircle(it) : (it.type === 'arrow' ? cleanArrow(it) : cleanCaption(it));
     if (!st) return;
     const list = presets[it.type];
